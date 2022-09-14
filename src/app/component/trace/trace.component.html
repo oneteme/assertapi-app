@@ -1,0 +1,89 @@
+<div class="content">
+    <div class="header-page">
+        <div class="title">
+            <div class="icon">
+                <mat-icon class="material-icons-outlined">desktop_windows</mat-icon>
+            </div>
+            <div class="label">
+                <div class="title">Supervision des tests</div>
+                <div class="sub-title">Historique</div>
+            </div>
+        </div>
+    </div>
+
+    <mat-form-field appearance="standard">
+        <mat-label>Filtre</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. aaa" #input>
+    </mat-form-field>
+
+    <div class="mat-elevation-z8 table">
+        <table mat-table [dataSource]="dataSource" matSort>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Nom de l'Api </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+            <ng-container matColumnDef="description">
+                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> 
+                    Description 
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="event">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Évènements </th>
+                <td mat-cell *matCellDef="let element"> 
+                    <div style="display: flex; align-items: center;">
+                        <mat-icon style="margin-right: 0.5em;">
+                            schedule     
+                        </mat-icon>
+                        {{element.event}} 
+                    </div>
+                    
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="envAct">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Environnement Actuel</th>
+                <td mat-cell *matCellDef="let element"> {{element.envAct}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="envExp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Environnement Attendu</th>
+                <td mat-cell *matCellDef="let element"> {{element.envExp}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="result">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Résultat </th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-icon [ngStyle]="{color: status[element.result]['color']}">{{status[element.result]['icon']}}
+                    </mat-icon>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{element: element}">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;  sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4">Aucune donnée correspondant au filtre "{{input.value}}"</td>
+            </tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 20, 50]"></mat-paginator>
+    </div>
+</div>
+
+<mat-menu #menu="matMenu">
+    <ng-template matMenuContent let-element="element">
+        <button mat-menu-item (click)="run(element)">
+            <mat-icon color="primary">replay</mat-icon>
+            <span>Relancer le test</span>
+        </button>
+    </ng-template>
+</mat-menu>
