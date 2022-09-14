@@ -1,0 +1,39 @@
+<div class="menu">
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <img alt="Logo Enedis" class="image" src="assets/images/logo_enedis.png">
+  <div></div>
+</div>
+<div class="container">
+  <div class="nova-tab-selector">
+    <div class="nova-tab" (click)="templateSelected = config"
+      [ngClass]="{ 'selected' : templateSelected === config || templateSelected === undefined }" 
+      matTooltip="Configuration" matTooltipPosition="right">
+      <mat-icon>settings</mat-icon>
+    </div>
+    <div class="nova-tab" (click)="templateSelected = trace" [ngClass]="{ 'selected' : templateSelected === trace }"
+      matTooltip="Historique" matTooltipPosition="right">
+      <mat-icon>history</mat-icon>
+    </div>
+  </div>
+  <ng-container [ngTemplateOutlet]="templateSelected || config"></ng-container>
+
+
+
+  <ng-template #config>
+    <app-config></app-config>
+  </ng-template>
+
+  <ng-template #trace>
+    <app-trace></app-trace>
+  </ng-template>
+
+</div>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item>
+      <mat-icon>bug_report</mat-icon>
+      <span>Assert-Api</span>
+  </button>
+</mat-menu>
