@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>
+    Ajouter un environnement
+</h2>
+<mat-dialog-content class="mat-typography">
+    <div style="display: flex; flex-direction: column;" [formGroup]="formGroup">
+        <div style="margin-bottom: 1em;">
+            <mat-form-field appearance="fill" floatLabel="always">
+                <mat-label>Serveur</mat-label>
+                <span matPrefix>https:// &nbsp;</span>
+                <input matInput formControlName="host">
+                <mat-error *ngIf="formGroup.get('host').hasError('required')">Le serveur est obligatoire</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Numéro du Port</mat-label>
+                <input matInput formControlName="port">
+                <mat-error *ngIf="formGroup.get('port').hasError('required')">Le numéro du port est obligatoire</mat-error>
+                <mat-error *ngIf="formGroup.get('port').hasError('pattern')">Le numéro du port est invalide</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Methode d'authentification</mat-label>
+                <mat-select formControlName="methodAuth">
+                    <mat-option value=""></mat-option>
+                    <mat-option value="BASIC">BASIC</mat-option>
+                    <mat-option value="TOKEN">TOKEN</mat-option>
+                    <mat-option value="NOVA_BASIC">NOVA_BASIC</mat-option>
+                    <mat-option value="NOVA_TOKEN">NOVA_TOKEN</mat-option>
+                </mat-select>
+                <mat-error *ngIf="formGroup.get('methodAuth').hasError('required')">La methode d'authentification est obligatoire</mat-error>
+            </mat-form-field>
+        </div>
+        <div style="display: flex; margin-bottom: 1em;" *ngIf="formGroup.get('hostAuth')">
+            <mat-form-field style="flex-grow: 1;" appearance="fill" floatLabel="always">
+                <mat-label>Serveur d'authentification</mat-label>
+                <input matInput formControlName="hostAuth">
+                <mat-error *ngIf="formGroup.get('hostAuth').hasError('required')">Le serveur d'authentification est obligatoire</mat-error>
+            </mat-form-field>
+        </div>
+        <div style="display: flex;">
+            <mat-form-field style="flex-grow: 1;"  appearance="fill">
+                <mat-label>Application</mat-label>
+                <input matInput formControlName="app">
+                <mat-error *ngIf="formGroup.get('app').hasError('required')">L'application est obligatoire</mat-error>
+            </mat-form-field>
+            <mat-form-field style="flex-grow: 1;"   appearance="fill">
+                <mat-label>Environnement</mat-label>
+                <input matInput formControlName="env">
+                <mat-error *ngIf="formGroup.get('env').hasError('required')">L'environnement est obligatoire</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Annuler</button>
+  <button mat-button (click)="add()" cdkFocusInitial>Ajouter</button>
+</mat-dialog-actions>

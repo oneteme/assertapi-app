@@ -1,0 +1,69 @@
+<h2 mat-dialog-title>
+    Ajouter un test
+</h2>
+<mat-dialog-content class="mat-typography" style="font-size: 12px;">
+    <mat-tab-group mat-stretch-tabs animationDuration="0ms" [formGroup]="formGroup">
+        <mat-tab label="Informations de l'api">
+            <div style="padding-top: 1em; display: flex; flex-direction: column; height: 220px;">
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="width: 100px;" appearance="fill">
+                        <mat-label>Methode</mat-label>
+                        <mat-select formControlName="method">
+                            <mat-option value="GET">GET</mat-option>
+                            <mat-option value="POST">POST</mat-option>
+                            <mat-option value="PUT">PUT</mat-option>
+                            <mat-option value="PATCH">PATCH</mat-option>
+                            <mat-option value="DELETE">DELETE</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="formGroup.get('method').hasError('required')">La methode est obligatoire</mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Uri</mat-label>
+                        <input matInput formControlName="uri">
+                        <mat-error *ngIf="formGroup.get('uri').hasError('required')">L'uri est obligatoire</mat-error>
+                    </mat-form-field>
+                </div>
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Nom de l'api</mat-label>
+                        <input matInput formControlName="name">
+                        <mat-error *ngIf="formGroup.get('name').hasError('required')">Le nom de l'api est obligatoire</mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Description</mat-label>
+                        <input matInput formControlName="description">
+                        <mat-error *ngIf="formGroup.get('description').hasError('required')">La description est obligatoire</mat-error>
+                    </mat-form-field>
+                </div>
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Application</mat-label>
+                        <input matInput formControlName="app">
+                        <mat-error *ngIf="formGroup.get('app').hasError('required')">L'application est obligatoire</mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Environnement</mat-label>
+                        <input matInput formControlName="env">
+                        <mat-error *ngIf="formGroup.get('env').hasError('required')">L'environnement est obligatoire</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Headers">
+            <mat-form-field style="padding-top: 1em; height: 220px; width: 100%;" appearance="fill" >
+                <mat-label>Headers</mat-label>
+                <textarea matInput></textarea>
+            </mat-form-field>
+        </mat-tab>
+        <mat-tab label="Body">
+            <mat-form-field style="padding-top: 1em; height: 220px; width: 100%;" appearance="fill" >
+                <mat-label>Body</mat-label>
+                <textarea matInput></textarea>
+            </mat-form-field>
+        </mat-tab>
+    </mat-tab-group>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Annuler</button>
+    <button mat-button (click)="add()" cdkFocusInitial>Ajouter</button>
+</mat-dialog-actions>

@@ -1,4 +1,6 @@
-class AssertionConfig {
+import { ApiServerConfig, ServerConfig } from "./environment.model";
+
+export class AssertionConfig {
     debug: boolean;
     enable: boolean;
     strict: boolean;
@@ -20,5 +22,15 @@ export class ApiRequest {
 
 export class ApiRequestServer {
     request: ApiRequest;
-    metadata: Map<String, String>;
+    metadata: { [key: string]: string };
+}
+
+export class Configuration {
+    refer: ServerConfig;
+    target: ServerConfig;
+}
+
+export class Data {
+    ids: Array<number>;
+    environments: Array<ApiServerConfig>;
 }

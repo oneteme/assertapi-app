@@ -2,10 +2,10 @@
     <button matTooltip="Télécharger tous les tests" matTooltipPosition="left" style="margin-bottom: 0.5em;" mat-mini-fab color="accent">
         <mat-icon>download</mat-icon>
     </button>
-    <button mat-mini-fab color="primary" [disabled]="!selection.selected.length" [matTooltipDisabled]="!selection.selected.length"  [matTooltip]="selection.selected.length > 1 ? 'Lancer les ' + selection.selected.length + ' tests' : 'Lancer le test'" matTooltipPosition="left" style="margin-bottom: 0.5em;">
+    <button mat-mini-fab color="primary" (click)="launchAll()" [disabled]="!selection.selected.length" [matTooltipDisabled]="!selection.selected.length"  [matTooltip]="selection.selected.length > 1 ? 'Lancer les ' + selection.selected.length + ' tests' : 'Lancer le test'" matTooltipPosition="left" style="margin-bottom: 0.5em;">
         <mat-icon>replay</mat-icon>
     </button>
-    <button matTooltip="Ajouter un nouveau test" matTooltipPosition="left" mat-mini-fab color="primary">
+    <button matTooltip="Ajouter un nouveau test" matTooltipPosition="left" mat-mini-fab color="primary" (click)="add()">
         <mat-icon>add</mat-icon>
     </button>
 </div>
@@ -18,7 +18,7 @@
             </div>
             <div class="label">
                 <div class="title">Supervision des tests</div>
-                <div class="sub-title">Configuration</div>
+                <div class="sub-title">Configuration des tests</div>
             </div>
         </div>
     </div>
@@ -97,7 +97,7 @@
 
 <mat-menu #menu="matMenu">
     <ng-template matMenuContent let-element="element">
-        <button mat-menu-item (click)="run(element)">
+        <button mat-menu-item (click)="launch(element)">
             <mat-icon color="primary">replay</mat-icon>
             <span>Lancer le test</span>
         </button>

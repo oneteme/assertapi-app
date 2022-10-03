@@ -1,0 +1,71 @@
+<div class="action-right">
+    <button (click)="add()" matTooltip="Ajouter un nouveau environnement" matTooltipPosition="left" mat-mini-fab color="primary">
+        <mat-icon>add</mat-icon>
+    </button>
+</div>
+
+<div class="content">
+    <div class="header-page">
+        <div class="title">
+            <div class="icon">
+                <mat-icon class="material-icons-outlined">desktop_windows</mat-icon>
+            </div>
+            <div class="label">
+                <div class="title">Supervision des tests</div>
+                <div class="sub-title">Configuration des environnements</div>
+            </div>
+        </div>
+    </div>
+    <mat-form-field appearance="standard">
+        <mat-label>Filtre</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
+    </mat-form-field>
+
+    <div class="mat-elevation-z8 table">
+        <table mat-table [dataSource]="dataSource" cdkDropList cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="drop($event)" matSort>
+            <ng-container matColumnDef="host">
+                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Serveur </th>
+                <td mat-cell *matCellDef="let element"> {{element.host}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="port">
+                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Port </th>
+                <td mat-cell *matCellDef="let element"> {{element.port}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="authMethod">
+                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Type d'authentification </th>
+                <td mat-cell *matCellDef="let element"> {{element.authMethod}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="app">
+                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Application </th>
+                <td mat-cell *matCellDef="let element"> {{element.app}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="env">
+                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Environnement </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.env}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button color="warn" (click)="remove(element)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;  sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4">Aucune donnée correspondant au filtre "{{input.value}}"</td>
+            </tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 20, 50]"></mat-paginator>
+    </div>
+</div> 
