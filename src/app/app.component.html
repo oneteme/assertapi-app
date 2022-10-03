@@ -7,22 +7,30 @@
 </div>
 <div class="container">
   <div class="nova-tab-selector">
-    <div class="nova-tab" (click)="templateSelected = config"
-      [ngClass]="{ 'selected' : templateSelected === config || templateSelected === undefined }" 
-      matTooltip="Configuration" matTooltipPosition="right">
+    <div class="nova-tab" routerLink="/home/environment" routerLinkActive="selected"
+      matTooltip="Configuration des environnements" matTooltipPosition="right">
       <mat-icon>settings</mat-icon>
     </div>
-    <div class="nova-tab" (click)="templateSelected = trace" [ngClass]="{ 'selected' : templateSelected === trace }"
-      matTooltip="Historique" matTooltipPosition="right">
+    <div class="nova-tab" routerLink="/home/request" routerLinkActive="selected"
+      matTooltip="Liste des requêtes" matTooltipPosition="right">
+      <mat-icon>checklist_rtl</mat-icon>
+    </div>
+    <div class="nova-tab" routerLink="/home/trace" routerLinkActive="selected"
+      matTooltip="Historique des tests" matTooltipPosition="right">
       <mat-icon>history</mat-icon>
     </div>
   </div>
-  <ng-container [ngTemplateOutlet]="templateSelected || config"></ng-container>
+  <router-outlet></router-outlet>
+  <!-- <ng-container [ngTemplateOutlet]="templateSelected || request"></ng-container> -->
 
 
 
-  <ng-template #config>
-    <app-config></app-config>
+  <ng-template #environment>
+    <app-environment></app-environment>
+  </ng-template>
+
+  <ng-template #request>
+    <app-request></app-request>
   </ng-template>
 
   <ng-template #trace>

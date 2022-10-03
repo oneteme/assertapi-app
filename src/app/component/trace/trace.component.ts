@@ -4,8 +4,10 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiAssertionsResultServer } from 'src/app/model/trace.model';
-import { AssertapiServerService } from 'src/app/service/assertapi-server.service';
+import { AssertapiClientService } from 'src/app/service/assertapi-client.service';
+import { TraceService } from 'src/app/service/trace.service';
 
 
 interface TableElement {
@@ -50,7 +52,7 @@ export class TraceComponent implements OnInit, AfterViewInit {
   private datePipe: DatePipe = new DatePipe("fr-FR");
 
   status = STATUS;
-  displayedColumns: string[] = ['name', 'description', 'event', 'envAct', 'envExp', 'result', 'action'];
+  displayedColumns: string[] = ['name', 'description', 'event', 'envExp', 'envAct', 'result', 'action'];
   dataSource: MatTableDataSource<TableElement>;
   selection = new SelectionModel<TableElement>(true, []);
 
@@ -64,10 +66,13 @@ export class TraceComponent implements OnInit, AfterViewInit {
   //   }
   // }
 
-  constructor(private _service: AssertapiServerService) { }
+  constructor(private _service: TraceService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this.getTraces();
+    this.activatedRoute.queryParams.subscribe(
+      res => this.getTraces(res['id'] ? res['id'] : null)
+    )
+    
   }
 
   ngAfterViewInit(): void {
@@ -82,8 +87,8 @@ export class TraceComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getTraces() {
-    this._service.traces()
+  getTraces(id: number) {
+    this._service.getTrace(id)
       .subscribe({
         next: res => {
           this.dataSource = new MatTableDataSource(
@@ -93,6 +98,10 @@ export class TraceComponent implements OnInit, AfterViewInit {
           this.dataSource.sort = this.sort;
         }
       });
+  }
+
+  refresh(){
+    this.router.navigate(['home/trace']);
   }
 
   run(element: TableElement) {
