@@ -23,6 +23,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu'; 
 import { MatTooltipModule } from '@angular/material/tooltip'; 
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatBadgeModule } from '@angular/material/badge';
 import { RemoveDialogComponent as RemoveDialogEnvironmentComponent} from './component/environment/remove-dialog/remove-dialog.component'; 
 import { RemoveDialogComponent as RemoveDialogRequestComponent} from './component/request/remove-dialog/remove-dialog.component'; 
 import { MatDialogModule } from '@angular/material/dialog';
@@ -34,6 +35,7 @@ import { DefaultValueAccessor, FormsModule, ReactiveFormsModule } from '@angular
 import { MatSelectModule } from '@angular/material/select';
 import { LaunchDialogComponent } from './component/request/launch-dialog/launch-dialog.component';
 import { AppRoutingModule } from './app-routing.module';
+import { ComparatorDialogComponent } from './component/trace/comparator-dialog/comparator-dialog/comparator-dialog.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,8 @@ import { AppRoutingModule } from './app-routing.module';
     EnvironmentComponent,
     AddDialogEnvironmentComponent,
     AddDialogRequestComponent,
-    LaunchDialogComponent
+    LaunchDialogComponent,
+    ComparatorDialogComponent
   ],
   imports: [
     AppRoutingModule,
@@ -70,7 +73,8 @@ import { AppRoutingModule } from './app-routing.module';
     MatDialogModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatDividerModule
+    MatDividerModule,
+    MatBadgeModule
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' }],
   bootstrap: [AppComponent]

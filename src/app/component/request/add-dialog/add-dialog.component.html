@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>
-    Ajouter un test
+    {{isUpdate ? 'Modifier le test' : 'Ajouter un test' }}
 </h2>
 <mat-dialog-content class="mat-typography" style="font-size: 12px;">
     <mat-tab-group mat-stretch-tabs animationDuration="0ms" [formGroup]="formGroup">
@@ -38,13 +38,17 @@
                 <div style="margin-bottom: 1em; display: flex;">
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Application</mat-label>
-                        <input matInput formControlName="app">
+                        <mat-select formControlName="app">
+                            <mat-option *ngFor="let app of apps" [value]="app.value">{{app.name}}</mat-option>
+                        </mat-select>
                         <mat-error *ngIf="formGroup.get('app').hasError('required')">L'application est obligatoire</mat-error>
                     </mat-form-field>
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Environnement</mat-label>
-                        <input matInput formControlName="env">
-                        <mat-error *ngIf="formGroup.get('env').hasError('required')">L'environnement est obligatoire</mat-error>
+                        <mat-select formControlName="envs" multiple>
+                            <mat-option *ngFor="let env of envs" [value]="env.value">{{env.name}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="formGroup.get('envs').hasError('required')">L'environnement est obligatoire</mat-error>
                     </mat-form-field>
                 </div>
             </div>
@@ -65,5 +69,5 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Annuler</button>
-    <button mat-button (click)="add()" cdkFocusInitial>Ajouter</button>
+    <button mat-button (click)="add()" cdkFocusInitial>{{isUpdate ? 'Modifier' : 'Ajouter'}}</button>
 </mat-dialog-actions>

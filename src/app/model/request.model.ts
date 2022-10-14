@@ -1,3 +1,4 @@
+import { TableElement } from "../component/request/request.component";
 import { ApiServerConfig, ServerConfig } from "./environment.model";
 
 export class AssertionConfig {
@@ -6,6 +7,11 @@ export class AssertionConfig {
     strict: boolean;
     parallel: boolean;
     excludePaths: string[];
+}
+
+export class ApiRequestGroupServer {
+    app: string;
+    env: string;
 }
 
 export class ApiRequest {
@@ -22,7 +28,7 @@ export class ApiRequest {
 
 export class ApiRequestServer {
     request: ApiRequest;
-    metadata: { [key: string]: string };
+    requestGroupList: Array<ApiRequestGroupServer>;
 }
 
 export class Configuration {
@@ -31,6 +37,6 @@ export class Configuration {
 }
 
 export class Data {
-    ids: Array<number>;
+    tableElements: Array<TableElement>;
     environments: Array<ApiServerConfig>;
 }

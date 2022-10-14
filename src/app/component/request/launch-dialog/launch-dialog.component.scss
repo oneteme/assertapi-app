@@ -2,3 +2,17 @@ mat-form-field:not(:first-child) {
     margin-left: 1em;
 }
 
+table {
+    width: 100%;
+}
+
+.table {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    .mat-paginator {
+        position: sticky;
+        bottom: 0;
+    }
+}
