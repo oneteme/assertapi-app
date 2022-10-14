@@ -20,7 +20,10 @@ export class AddDialogComponent implements OnInit {
     app: new FormControl('', Validators.required)
   });
 
-  constructor(public dialogRef: MatDialogRef<AddDialogComponent>, private _service: EnvironmentService) { }
+  constructor(
+    public dialogRef: MatDialogRef<AddDialogComponent>, 
+    private _service: EnvironmentService
+  ) { }
 
   ngOnInit(): void {
     this.methodAuth.valueChanges.subscribe(

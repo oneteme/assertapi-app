@@ -15,7 +15,12 @@ export class RequestService extends AssertapiClientService {
 
     putRequest(apiRequestServer: ApiRequestServer): Observable<void> {
         let url: string = `${environment.server}/v1/assert/api/request`;
-        return this.put(url, apiRequestServer.request, { app: apiRequestServer.metadata['app'], env: apiRequestServer.metadata['env'] });
+        return this.put(url, apiRequestServer);
+    }
+
+    updateRequest(apiRequestServer: ApiRequestServer): Observable<void> {
+        let url: string = `${environment.server}/v1/assert/api/request`;
+        return this.post(url, apiRequestServer);
     }
 
     deleteRequest(ids: number[]): Observable<void> {

@@ -1,6 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -8,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiAssertionsResultServer } from 'src/app/model/trace.model';
 import { AssertapiClientService } from 'src/app/service/assertapi-client.service';
 import { TraceService } from 'src/app/service/trace.service';
+import { ComparatorDialogComponent } from './comparator-dialog/comparator-dialog/comparator-dialog.component';
 
 
 interface TableElement {
@@ -52,7 +54,7 @@ export class TraceComponent implements OnInit, AfterViewInit {
   private datePipe: DatePipe = new DatePipe("fr-FR");
 
   status = STATUS;
-  displayedColumns: string[] = ['name', 'description', 'event', 'envExp', 'envAct', 'result', 'action'];
+  displayedColumns: string[] = ['name', 'description', 'event', 'envExp', 'envAct', 'result', 'action', 'select', 'refresh'];
   dataSource: MatTableDataSource<TableElement>;
   selection = new SelectionModel<TableElement>(true, []);
 
@@ -66,7 +68,7 @@ export class TraceComponent implements OnInit, AfterViewInit {
   //   }
   // }
 
-  constructor(private _service: TraceService, private router: Router, private activatedRoute: ActivatedRoute) { }
+  constructor(public dialog: MatDialog, private _service: TraceService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(
@@ -77,6 +79,21 @@ export class TraceComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     
+  }
+
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+      return;
+    }
+
+    this.selection.select(...this.dataSource.data);
   }
 
   applyFilter(event: Event) {
@@ -105,6 +122,11 @@ export class TraceComponent implements OnInit, AfterViewInit {
   }
 
   run(element: TableElement) {
+    console.log(`Lancement du test numéro ${element.id}`)
+  }
+
+  compare(element: TableElement) {
+    this.dialog.open(ComparatorDialogComponent);
     console.log(`Lancement du test numéro ${element.id}`)
   }
 }
