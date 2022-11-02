@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>
-    Ajouter un environnement
+    {{isUpdate ? 'Modifier l\'environnement' : 'Ajouter un environnement' }}
 </h2>
 <mat-dialog-content class="mat-typography">
     <div style="display: flex; flex-direction: column;" [formGroup]="formGroup">
@@ -51,5 +51,5 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Annuler</button>
-  <button mat-button (click)="add()" cdkFocusInitial>Ajouter</button>
+  <button mat-button (click)="add()" cdkFocusInitial>{{isUpdate ? 'Modifier' : 'Ajouter'}}</button>
 </mat-dialog-actions>

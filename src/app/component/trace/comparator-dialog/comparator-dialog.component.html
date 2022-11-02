@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>
+    Comparaison des reponses
+</h2>
+
+<ngx-monaco-diff-editor style="height: 250px; width: 75vw;" [options]="options" [originalModel]="originalModel" [modifiedModel]="modifiedModel"></ngx-monaco-diff-editor>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Fermer</button>
+</mat-dialog-actions>
+

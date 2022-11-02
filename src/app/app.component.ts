@@ -1,6 +1,5 @@
-import { FocusMonitor } from '@angular/cdk/a11y';
-import { AfterViewInit, Component, OnInit, TemplateRef } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { EnvironmentService } from './service/environment.service';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +8,9 @@ import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular
 })
 export class AppComponent implements OnInit {
 
-  constructor() { }
+  constructor(private environmentService: EnvironmentService) { }
 
   ngOnInit(): void {
-    
+    this.environmentService.getEnvironments().subscribe();
   }
 }

@@ -1,11 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { filter, finalize } from 'rxjs';
 import { ApiServerConfig } from 'src/app/model/environment.model';
 import { ApiRequest, ApiRequestServer, AssertionConfig } from 'src/app/model/request.model';
 import { RequestService } from 'src/app/service/request.service';
-import { TableElement } from '../request.component';
 
 @Component({
   templateUrl: './add-dialog.component.html',
@@ -18,15 +17,15 @@ export class AddDialogComponent implements OnInit {
   envs: Array<{name: string, value: string}>;
   apps: Array<{name: string, value: string}>;
 
-  formGroup = new FormGroup({
-    method: new FormControl('', Validators.required),
-    uri: new FormControl('', [Validators.required]),
-    name: new FormControl('', Validators.required),
-    description: new FormControl('', Validators.required),
-    app: new FormControl('', Validators.required),
-    envs: new FormControl('', Validators.required),
-    headers: new FormControl(null),
-    body: new FormControl(null)
+  formGroup = new UntypedFormGroup({
+    method: new UntypedFormControl('', Validators.required),
+    uri: new UntypedFormControl('', [Validators.required]),
+    name: new UntypedFormControl('', Validators.required),
+    description: new UntypedFormControl('', Validators.required),
+    app: new UntypedFormControl('', Validators.required),
+    envs: new UntypedFormControl('', Validators.required),
+    headers: new UntypedFormControl(null),
+    body: new UntypedFormControl(null)
   });
 
   constructor(
@@ -57,9 +56,21 @@ export class AddDialogComponent implements OnInit {
   add() {
     if(this.formGroup.valid) {
       var apiRequestServer = this.formToModel();
-      (!this.isUpdate ? this._service.putRequest(apiRequestServer) : this._service.updateRequest(apiRequestServer))
-        .pipe(finalize(() => this.dialogRef.close(apiRequestServer)))
-        .subscribe();
+      if(this.isUpdate) {
+        apiRequestServer.request.id = this.data.tableElement.request.id;
+        this._service.updateRequest(apiRequestServer)
+          .subscribe({
+            next: () => this.dialogRef.close(apiRequestServer)
+          });
+      } else {
+        this._service.putRequest(apiRequestServer)
+          .subscribe({
+            next: res => {
+              apiRequestServer.request.id = res;
+              this.dialogRef.close(apiRequestServer);
+            }
+          });
+      }
     } else {
       this.formGroup.markAllAsTouched();
     }
@@ -68,7 +79,6 @@ export class AddDialogComponent implements OnInit {
   formToModel(): ApiRequestServer {
     let model = new ApiRequestServer();
     model.request = new ApiRequest();
-    model.request.id = this.data.tableElement?.id;
     model.request.method = this.method.value;
     model.request.uri = this.uri.value;
     model.request.name = this.name.value;
@@ -80,14 +90,14 @@ export class AddDialogComponent implements OnInit {
     return model;
   }
 
-  modelToForm(data: TableElement) {
-    this.method.setValue(data.method);
-    this.uri.setValue(data.uri);
-    this.name.setValue(data.name);
-    this.description.setValue(data.description);
-    this.body.setValue(data.body);
-    this.app.setValue(data.app);
-    this.selectedEnvs.setValue(data.envs);
+  modelToForm(data: ApiRequestServer) {
+    this.method.setValue(data.request.method);
+    this.uri.setValue(data.request.uri);
+    this.name.setValue(data.request.name);
+    this.description.setValue(data.request.description);
+    this.body.setValue(data.request.body);
+    this.app.setValue(data.requestGroupList[0].app);
+    this.selectedEnvs.setValue(data.requestGroupList.map(r => r.env));
   }
 
   get method(): AbstractControl | null {
@@ -124,6 +134,6 @@ export class AddDialogComponent implements OnInit {
 }
 
 class Data {
-  tableElement: TableElement;
+  tableElement: ApiRequestServer;
   environments: Array<ApiServerConfig>;
 }

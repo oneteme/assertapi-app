@@ -33,9 +33,12 @@ import { AddDialogComponent as  AddDialogRequestComponent } from './component/re
 import { MatFormFieldModule } from '@angular/material/form-field';  
 import { DefaultValueAccessor, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-import { LaunchDialogComponent } from './component/request/launch-dialog/launch-dialog.component';
+import { LaunchDialogComponent as LaunchDialogRequestComponent} from './component/request/launch-dialog/launch-dialog.component';
+import { LaunchDialogComponent as LaunchDialogTraceComponent} from './component/trace/launch-dialog/launch-dialog.component';
+
 import { AppRoutingModule } from './app-routing.module';
-import { ComparatorDialogComponent } from './component/trace/comparator-dialog/comparator-dialog/comparator-dialog.component';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { ComparatorDialogComponent } from './component/trace/comparator-dialog/comparator-dialog.component';
 
 @NgModule({
   declarations: [
@@ -47,8 +50,9 @@ import { ComparatorDialogComponent } from './component/trace/comparator-dialog/c
     EnvironmentComponent,
     AddDialogEnvironmentComponent,
     AddDialogRequestComponent,
-    LaunchDialogComponent,
-    ComparatorDialogComponent
+    LaunchDialogRequestComponent,
+    LaunchDialogTraceComponent,
+    ComparatorDialogComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -74,7 +78,8 @@ import { ComparatorDialogComponent } from './component/trace/comparator-dialog/c
     MatFormFieldModule,
     MatSelectModule,
     MatDividerModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MonacoEditorModule.forRoot()
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' }],
   bootstrap: [AppComponent]

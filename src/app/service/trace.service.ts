@@ -8,7 +8,7 @@ import { AssertapiClientService } from "./assertapi-client.service";
     providedIn: 'root'
 })
 export class TraceService extends AssertapiClientService {
-    getTrace(id: number): Observable<Array<ApiAssertionsResultServer>> {
+    getTrace(id?: number): Observable<Array<ApiAssertionsResultServer>> {
         let url: string = `${environment.server}/v1/assert/api/trace`;
         return this.get(url, id ? { 'id': [id.toString()] } : {});
     }

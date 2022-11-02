@@ -8,12 +8,12 @@ import { AssertapiClientService } from "./assertapi-client.service";
     providedIn: 'root'
 })
 export class RequestService extends AssertapiClientService {
-    getRequest(): Observable<Array<ApiRequestServer>> {
+    getRequests(): Observable<Array<ApiRequestServer>> {
         let url: string = `${environment.server}/v1/assert/api/request/all`;
         return this.get(url);
     }
 
-    putRequest(apiRequestServer: ApiRequestServer): Observable<void> {
+    putRequest(apiRequestServer: ApiRequestServer): Observable<number> {
         let url: string = `${environment.server}/v1/assert/api/request`;
         return this.put(url, apiRequestServer);
     }

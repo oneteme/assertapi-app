@@ -1,5 +1,5 @@
 export class ServerAuth {
-    type: 'BASIC' | 'NOVA_BASIC' | 'NOVA_TOKEN' | 'TOKEN';
+    type: LoginTypeEnum;
     'access-token-url'?: string;
     username?: string;
     password?: string;
@@ -18,4 +18,11 @@ export class ApiServerConfig {
     app: string;
     env: string;
     isProd: boolean;
+}
+
+export enum LoginTypeEnum {
+    BASIC = 'BASIC',
+    NOVA_BASIC = 'NOVA_BASIC', 
+    NOVA_TOKEN = 'NOVA_TOKEN', 
+    TOKEN = 'TOKEN'
 }
