@@ -1,4 +1,3 @@
-import { TableElement } from "../component/request/request.component";
 import { ApiServerConfig, ServerConfig } from "./environment.model";
 
 export class AssertionConfig {
@@ -37,6 +36,6 @@ export class Configuration {
 }
 
 export class Data {
-    tableElements: Array<TableElement>;
+    tableElements: Array<ApiRequestServer>;
     environments: Array<ApiServerConfig>;
 }

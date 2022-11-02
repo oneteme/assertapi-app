@@ -26,17 +26,17 @@
             (cdkDropListDropped)="drop($event)" matSort>
             <ng-container matColumnDef="host">
                 <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Serveur </th>
-                <td mat-cell *matCellDef="let element"> {{element.host}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.serverConfig.host}} </td>
             </ng-container>
 
             <ng-container matColumnDef="port">
                 <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Port </th>
-                <td mat-cell *matCellDef="let element"> {{element.port}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.serverConfig.port}} </td>
             </ng-container>
 
             <ng-container matColumnDef="authMethod">
                 <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Type d'authentification </th>
-                <td mat-cell *matCellDef="let element"> {{element.authMethod}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.serverConfig.auth.type}} </td>
             </ng-container>
 
             <ng-container matColumnDef="app">
@@ -54,9 +54,15 @@
             <ng-container matColumnDef="action">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button color="warn" (click)="remove(element)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
+                    <div style="display: flex;">
+                        <button mat-icon-button (click)="update(element)">
+                            <mat-icon color="primary">edit_note</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="remove(element)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                    
                 </td>
             </ng-container>
 
