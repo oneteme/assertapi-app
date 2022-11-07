@@ -56,7 +56,7 @@ export class LaunchDialogComponent implements OnInit {
       var configuration: Configuration = {refer: this.expectedLogin.serverConfig, target: this.actualLogin.serverConfig};
       configuration.refer.auth = {...configuration.refer.auth, username: this.expectedLoginUsername.value, password: this.actualLoginPassword.value};
       configuration.target.auth = {...configuration.target.auth, username: this.actualLoginUsername.value, password: this.actualLoginPassword.value};
-      this._mainService.run(this.actualLogin.app, this.actualLogin.env, this.expectedLogin.env, this.data.tableElements.map(t => t.request.id), null, configuration)
+      this._mainService.run(null, this.actualLogin.app, this.actualLogin.env, this.expectedLogin.env, this.data.tableElements.map(t => t.request.id), null, configuration)
         .subscribe({
           next: res => {
             this.dialogRef.close();

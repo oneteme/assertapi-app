@@ -84,8 +84,8 @@ export class AddDialogComponent implements OnInit {
   modelToForm(data: ApiServerConfig) {
     this.host.setValue(data.serverConfig.host);
     this.port.setValue(data.serverConfig.port);
-    this.methodAuth.setValue(data.serverConfig.auth.type);
-    this.hostAuth.setValue(data.serverConfig.auth['access-token-url']);
+    this.methodAuth.setValue(data.serverConfig.auth?.type);
+    this.hostAuth?.setValue(data.serverConfig.auth?.['access-token-url']);
     this.env.setValue(data.env);
     this.app.setValue(data.app);
   }

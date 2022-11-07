@@ -2,7 +2,7 @@
     Lancer les tests
 </h2>
 <mat-dialog-content class="mat-typography" style="font-size: 12px;">
-    <div style="display: flex;" *ngIf="step == 1">
+    <div style="display: flex;">
         <div style="display: flex; flex-direction: column;" [formGroup]="actualForm">
             <h4>Environnement Actuel</h4>
             <div style="margin-bottom: 1em; display: flex;">
@@ -11,7 +11,7 @@
                     <mat-select formControlName="app">
                         <mat-option *ngFor="let app of actualApps" [value]="app.value">{{app.name}}</mat-option>
                     </mat-select>
-                    <mat-error *ngIf="actualForm.get('app').hasError('required')">L'application est obligatoire
+                    <mat-error *ngIf="actualApp.hasError('required')">L'application est obligatoire
                     </mat-error>
                 </mat-form-field>
                 <mat-form-field style="flex-grow: 1;" appearance="fill">
@@ -19,7 +19,7 @@
                     <mat-select formControlName="env">
                         <mat-option *ngFor="let env of actualEnvs" [value]="env.value">{{env.name}}</mat-option>
                     </mat-select>
-                    <mat-error *ngIf="actualForm.get('env').hasError('required')">L'environnement est obligatoire
+                    <mat-error *ngIf="actualEnv.hasError('required')">L'environnement est obligatoire
                     </mat-error>
                 </mat-form-field>
             </div>
@@ -38,7 +38,7 @@
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Nom d'utilisateur</mat-label>
                         <input matInput formControlName="username">
-                        <mat-error *ngIf="actualLogin.get('username').hasError('required')">Le nom d'utilisateur est
+                        <mat-error *ngIf="actualLoginUsername.hasError('required')">Le nom d'utilisateur est
                             obligatoire</mat-error>
                     </mat-form-field>
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
@@ -47,13 +47,12 @@
                         <button mat-icon-button matSuffix (click)="hide = !hide">
                             <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                         </button>
-                        <mat-error *ngIf="actualLogin.get('password').hasError('required')">Le mot de passe est
+                        <mat-error *ngIf="actualLoginpassword.hasError('required')">Le mot de passe est
                             obligatoire</mat-error>
                     </mat-form-field>
                 </div>
             </div>
         </div>
-
         <mat-divider [vertical]="true"></mat-divider>
         <div style="display: flex; flex-direction: column;">
             <h4>Environnement Attendu</h4>
@@ -63,7 +62,7 @@
                     <mat-select formControlName="app">
                         <mat-option *ngFor="let app of expectedApps" [value]="app.value">{{app.name}}</mat-option>
                     </mat-select>
-                    <mat-error *ngIf="expectedForm.get('app').hasError('required')">L'environnement est obligatoire
+                    <mat-error *ngIf="expectedApp.hasError('required')">L'environnement est obligatoire
                     </mat-error>
                 </mat-form-field>
                 <mat-form-field style="flex-grow: 1;" appearance="fill">
@@ -71,7 +70,7 @@
                     <mat-select formControlName="env">
                         <mat-option *ngFor="let env of expectedEnvs" [value]="env.value">{{env.name}}</mat-option>
                     </mat-select>
-                    <mat-error *ngIf="expectedForm.get('env').hasError('required')">L'environnement est obligatoire
+                    <mat-error *ngIf="expectedEnv.hasError('required')">L'environnement est obligatoire
                     </mat-error>
                 </mat-form-field>
             </div>
@@ -90,7 +89,7 @@
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Nom d'utilisateur</mat-label>
                         <input matInput formControlName="username">
-                        <mat-error *ngIf="expectedLogin.get('username').hasError('required')">Le nom d'utilisateur est
+                        <mat-error *ngIf="expectedLoginUsername.hasError('required')">Le nom d'utilisateur est
                             obligatoire</mat-error>
                     </mat-form-field>
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
@@ -99,72 +98,16 @@
                         <button mat-icon-button matSuffix (click)="hide = !hide">
                             <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                         </button>
-                        <mat-error *ngIf="expectedLogin.get('password').hasError('required')">Le mot de passe est
+                        <mat-error *ngIf="expectedLoginpassword.hasError('required')">Le mot de passe est
                             obligatoire</mat-error>
                     </mat-form-field>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="table" style="width: 510px;" [hidden]="step != 2">
-        <table mat-table [dataSource]="dataSource" matSort>
-            <ng-container matColumnDef="name">
-                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Nom de l'Api </th>
-                <td mat-cell *matCellDef="let element"> {{element.request.name}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="description">
-                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Description </th>
-                <td mat-cell *matCellDef="let element"> {{element.request.description}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef>
-                    Désactiver
-                </th>
-                <td mat-cell *matCellDef="let row">
-                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                        [checked]="selection.isSelected(row)">
-                    </mat-checkbox>
-                </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns;  sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-        <mat-paginator [pageSizeOptions]="[10, 20, 50]"></mat-paginator>
-    </div>
-
-    <div *ngIf="step == 3" style="display: flex;">
-        <div style="max-height: 65vh; overflow-y: auto; scrollbar-width: thin;">
-            <mat-list>
-                <mat-list-item style="height: 50px;" *ngFor="let assertionResult of assertionResults" [ngStyle]="{'background-color': selectedIndex === assertionResult.result?.id ? 'rgba(0, 0, 0, 0.2)': null}">
-                    <mat-spinner mat-list-icon style="padding: 0" *ngIf="!assertionResult.result" color="primary" mode="indeterminate" diameter="20">
-                    </mat-spinner>
-                    <mat-icon mat-list-icon *ngIf="assertionResult.result" [ngStyle]="{color:status[assertionResult.result.status]['color']}">{{status[assertionResult.result.status]['icon']}}</mat-icon>
-                    <div mat-line>{{assertionResult.request.name}}</div>
-                    <div mat-line>{{assertionResult.request.description}}</div>
-                    <mat-checkbox style="margin-left: 1em;"></mat-checkbox>
-                    <button mat-icon-button style="margin-left: 1em;" (click)="onResult(assertionResult.result)">
-                        <mat-icon color="primary">
-                            visibility
-                        </mat-icon>
-                    </button>
-                </mat-list-item>
-            </mat-list>
-        </div>
-        <ng-container *ngIf="originalModel && modifiedModel">
-            <mat-divider [vertical]="true"></mat-divider>
-            <div style="max-height: 65vh; width: 90vh; overflow-y: auto; scrollbar-width: thin;">
-                <ngx-monaco-diff-editor [options]="options" [originalModel]="originalModel" [modifiedModel]="modifiedModel"></ngx-monaco-diff-editor>
-            </div>
-        </ng-container>
-    </div>
 </mat-dialog-content>
-
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Annuler</button>
-    <button mat-button (click)="choose()" *ngIf="step == 1 && data.tableElements.length > 1">Choisir</button>
+    <button mat-button (click)="choose()">Désactiver des tests</button>
     <button mat-button (click)="launch()" cdkFocusInitial>Lancer</button>
 </mat-dialog-actions>
