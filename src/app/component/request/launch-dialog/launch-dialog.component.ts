@@ -6,9 +6,31 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DiffEditorModel } from 'ngx-monaco-editor-v2';
 import { distinctUntilChanged, filter } from 'rxjs';
-import { ApiRequestServer, Configuration, Data } from 'src/app/model/request.model';
+import { ApiRequest, ApiRequestServer, Configuration, Data } from 'src/app/model/request.model';
+import { ApiAssertionsResult, ApiAssertionsResultServer, ApiExecution } from 'src/app/model/trace.model';
 import { MainService } from 'src/app/service/main.service';
+import { environment } from 'src/environments/environment';
+
+const STATUS: { [key: string]: Object } = {
+  OK: {
+    color: 'green',
+    icon: 'done'
+  },
+  KO: {
+    color: 'gold',
+    icon: 'report'
+  },
+  SKIP: {
+    color: 'black',
+    icon: 'block'
+  },
+  FAIL: {
+    color: 'red',
+    icon: 'report'
+  }
+}
 
 @Component({
   templateUrl: './launch-dialog.component.html',
@@ -19,14 +41,29 @@ export class LaunchDialogComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
+  options = {
+    readOnly: true,
+    scrollbar: {
+      verticalScrollbarSize: 5,
+		  horizontalScrollbarSize: 5,
+    }
+  };
+
+  originalModel: DiffEditorModel;
+
+  modifiedModel: DiffEditorModel;
+
+  status = STATUS;
+
   hide: boolean = true;
   step: number = 1;
+  selectedIndex: number;
 
   actualForm: UntypedFormGroup = new UntypedFormGroup({
     app: new UntypedFormControl('', Validators.required),
     env: new UntypedFormControl('', Validators.required),
     login: new UntypedFormGroup({
-      type: new UntypedFormControl('', Validators.required)
+      type: new UntypedFormControl('')
     })
   });
 
@@ -34,9 +71,9 @@ export class LaunchDialogComponent implements OnInit, AfterViewInit {
     app: new UntypedFormControl('', Validators.required),
     env: new UntypedFormControl('', Validators.required),
     login: new UntypedFormGroup({
-      type: new UntypedFormControl('', Validators.required)
+      type: new UntypedFormControl('')
     })
-  })
+  });
 
   actualEnvs: Array<{name: string, value: string}>;
   actualApps: Array<{name: string, value: string}>;
@@ -50,12 +87,12 @@ export class LaunchDialogComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<ApiRequestServer>;
   selection = new SelectionModel<ApiRequestServer>(true, []);
 
+  assertionResults: Array<ApiAssertionsResultServer> = [];
+
   constructor(
     public dialogRef: MatDialogRef<LaunchDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Data,
     private _service: MainService,
-    private router: Router, 
-    private activatedRoute: ActivatedRoute
   ) { 
     this.actualApps = Array.from(new Set(data.environments.filter(e => data.tableElements.map(t => t.requestGroupList[0].app).includes(e.app)).map(d => d.app))).map(a => ({name: a, value: a}));
     this.expectedApps = Array.from(new Set(data.environments.filter(e => data.tableElements.map(t => t.requestGroupList[0].app).includes(e.app)).map(d => d.app))).map(a => ({name: a, value: a}));
@@ -81,7 +118,7 @@ export class LaunchDialogComponent implements OnInit, AfterViewInit {
     ).subscribe({
       next: res => {
         var environment = this.data.environments.find(d => d.app == this.actualApp.value && d.env == res).serverConfig;
-        this.actualLoginType.setValue(environment.auth.type);
+        this.actualLoginType.setValue(environment.auth?.type);
         if(this.actualLoginType.value === 'NOVA_BASIC' || this.actualLoginType.value === 'BASIC') {
           this.actualLogin.addControl('username', new UntypedFormControl('', Validators.required));
           this.actualLogin.addControl('password', new UntypedFormControl('', Validators.required));
@@ -116,15 +153,44 @@ export class LaunchDialogComponent implements OnInit, AfterViewInit {
 
   launch(): void {
     if(this.actualForm.valid && this.expectedForm.valid) {
-      this.configuration.refer.auth = {...this.configuration.refer.auth, username: this.expectedLoginUsername.value, password: this.expectedLoginpassword.value}; 
-      this.configuration.target.auth = {...this.configuration.target.auth, username: this.actualLoginUsername.value, password: this.actualLoginpassword.value}; 
-      this._service.run(this.actualApp.value, this.actualEnv.value, this.expectedEnv.value, null, this.selection.selected.map(t => t.request.id), this.configuration)
-        .subscribe({
-          next: res => {
-            this.dialogRef.close();
-            this.router.navigate(['home/trace'], {relativeTo: this.activatedRoute, queryParams: {id: res}});
-          }
+      this.step = 3;
+      this.configuration.refer.auth = {...this.configuration.refer.auth, username: this.expectedLoginUsername?.value, password: this.expectedLoginpassword?.value}; 
+      this.configuration.target.auth = {...this.configuration.target.auth, username: this.actualLoginUsername?.value, password: this.actualLoginpassword?.value}; 
+      
+      const eventSource = new EventSource(`${environment.server}/v1/assert/api/progress`);
+      let guidValue = null;
+      eventSource.addEventListener("GUI_ID", (event) => {
+        guidValue = JSON.parse(event.data);
+        console.log(`Guid from server: ${guidValue}`);
+        eventSource.addEventListener(`start ${guidValue}`, (event) => {
+          const request: ApiRequest = JSON.parse(event.data);
+          const assertionResultServer = new ApiAssertionsResultServer();
+          assertionResultServer.request = request;
+          this.assertionResults.push(assertionResultServer);
+          console.log("request", request, this.assertionResults);
+          eventSource.addEventListener(`${request.id} end ${guidValue}`, (event) => {
+            const result: ApiAssertionsResult = JSON.parse(event.data);
+            assertionResultServer.result = result;
+            console.log("result", result, this.assertionResults);
+          });
+        });
+        
+        this._service.run(guidValue, this.actualApp.value, this.actualEnv.value, this.expectedEnv.value, this.data.tableElements.length == 1 ? [this.data.tableElements[0].request.id] : null, this.selection.selected.map(t => t.request.id), this.configuration)
+          .subscribe({
+            next: res => {
+              console.log(res);
+            }
+          });
       });
+
+      eventSource.onerror = (event) => {
+        eventSource.close();
+      };
+  
+      eventSource.onopen = () => {
+        console.log("connection opened");
+      };
+
     } else {
       this.actualForm.markAllAsTouched();
       this.expectedForm.markAllAsTouched();
@@ -142,6 +208,43 @@ export class LaunchDialogComponent implements OnInit, AfterViewInit {
     } else {
       this.actualForm.markAllAsTouched();
       this.expectedForm.markAllAsTouched();
+    }
+  }
+
+  onResult(result: ApiAssertionsResult) {
+    if(result) {
+      this.originalModel = this.toCode(result.actExecution, result.step);
+      this.modifiedModel = this.toCode(result.expExecution, result.step);
+      this.selectedIndex = result.id;
+    }
+  }
+
+  toCode(apiExecution: ApiExecution, step: string): DiffEditorModel {
+    switch(step) {
+      case 'HTTP_CODE' : {
+        return {
+          code: apiExecution.statusCode.toString(),
+          language: 'text/plain'
+        };
+      }
+      case 'CONTENT_TYPE' : {
+        return {
+          code: apiExecution.contentType,
+          language: 'text/plain'
+        };
+      }
+      case 'RESPONSE_CONTENT' : {
+        return {
+          code: JSON.stringify(JSON.parse(apiExecution.response), null, 1),
+          language: 'json'
+        };
+      }
+      default : {
+        return {
+          code: JSON.stringify(JSON.parse(apiExecution.response), null, 1),
+          language: 'json'
+        };
+      }
     }
   }
 

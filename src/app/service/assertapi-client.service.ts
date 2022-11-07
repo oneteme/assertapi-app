@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -29,9 +29,9 @@ export class AssertapiClientService {
       .put(url, body, { params: filterArgs(args) });
   }
 
-  post(url: string, body?: any,  args?: { [param: string]: string | string[] }): Observable<any> {
+  post(url: string, body?: any, headers?: { [param: string]: string | string[]} , args?: { [param: string]: string | string[] }): Observable<any> {
     return this.http
-      .post(url, body, { params: filterArgs(args) });
+      .post(url, body, { headers: filterArgs(headers), params: filterArgs(args) });
   }
 }
 

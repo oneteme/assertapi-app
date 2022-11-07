@@ -24,6 +24,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip'; 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatListModule } from '@angular/material/list'; 
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RemoveDialogComponent as RemoveDialogEnvironmentComponent} from './component/environment/remove-dialog/remove-dialog.component'; 
 import { RemoveDialogComponent as RemoveDialogRequestComponent} from './component/request/remove-dialog/remove-dialog.component'; 
 import { MatDialogModule } from '@angular/material/dialog';
@@ -39,6 +41,10 @@ import { LaunchDialogComponent as LaunchDialogTraceComponent} from './component/
 import { AppRoutingModule } from './app-routing.module';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { ComparatorDialogComponent } from './component/trace/comparator-dialog/comparator-dialog.component';
+import { LaunchContentComponent } from './launch-content/launch-content.component';
+import { LaunchDialogComponent } from './component/request/launch-dialog/launch-dialog/launch-dialog.component';
+import { ChooseContentComponent } from './component/request/launch-dialog/choose-content/choose-content.component';
+import { ResultContentComponent } from './component/request/launch-dialog/result-content/result-content.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +59,11 @@ import { ComparatorDialogComponent } from './component/trace/comparator-dialog/c
     LaunchDialogRequestComponent,
     LaunchDialogTraceComponent,
     ComparatorDialogComponent,
+    LaunchContentComponent,
+    LaunchDialogComponent,
+    ChooseContentComponent,
+    ResultContentComponent,
+    
   ],
   imports: [
     AppRoutingModule,
@@ -79,6 +90,8 @@ import { ComparatorDialogComponent } from './component/trace/comparator-dialog/c
     MatSelectModule,
     MatDividerModule,
     MatBadgeModule,
+    MatListModule,
+    MatProgressSpinnerModule,
     MonacoEditorModule.forRoot()
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' }],
