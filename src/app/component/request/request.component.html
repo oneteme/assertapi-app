@@ -20,25 +20,40 @@
         </div>
     </div>
     <mat-form-field appearance="standard">
-        <mat-label>Filtre</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Filtrer..." #input>
     </mat-form-field>
 
     <div class="mat-elevation-z8 table">
-        <table mat-table [dataSource]="dataSource" cdkDropList cdkDropListOrientation="horizontal"
-            (cdkDropListDropped)="drop($event)" matSort>
+        <table mat-table [dataSource]="dataSource" matSort>
             <ng-container matColumnDef="name">
-                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Nom de l'Api </th>
-                <td mat-cell *matCellDef="let element"> {{element.request.name}} </td>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nom de l'Api </th>
+                <td mat-cell *matCellDef="let element"> 
+                    {{element.request.name}}
+                    <div style="display: flex; align-items: center; font-size: 11px;">
+                        <mat-icon class="material-icons-outlined" style="margin-right: 0.2em; font-size: 18px; width: 18px; height: 18px;">description</mat-icon>
+                        {{element.request.description}}
+                    </div>
+                </td>
             </ng-container>
 
-            <ng-container matColumnDef="description">
-                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Description </th>
-                <td mat-cell *matCellDef="let element"> {{element.request.description}} </td>
+            <ng-container matColumnDef="app">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Application </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.requestGroupList[0].app}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="envs">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Environnement</th>
+                <td mat-cell *matCellDef="let element">
+                    <ng-container *ngFor="let requestGroup of element.requestGroupList; let isLast = last">
+                        {{requestGroup.env}}<span *ngIf="!isLast">, </span>
+                    </ng-container>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="enable">
-                <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Activation </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Activation </th>
                 <td mat-cell *matCellDef="let element">
                     <mat-slide-toggle [checked]="element.request.configuration.enable" (toggleChange)="enableChange(element)">
                     </mat-slide-toggle>

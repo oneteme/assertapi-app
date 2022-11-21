@@ -1,10 +1,8 @@
-import { SelectionModel } from '@angular/cdk/collections';
 import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ApiRequest, ApiRequestServer } from 'src/app/model/request.model';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ApiRequestServer } from 'src/app/model/request.model';
 import { MatDialog } from '@angular/material/dialog';
 import { RemoveDialogComponent } from './remove-dialog/remove-dialog.component';
 import { AddDialogComponent } from './add-dialog/add-dialog.component';
@@ -12,6 +10,7 @@ import { ApiServerConfig } from 'src/app/model/environment.model';
 import { LaunchDialogComponent } from './launch-dialog/launch-dialog.component';
 import { RequestService } from 'src/app/service/request.service';
 import { EnvironmentService } from 'src/app/service/environment.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-request',
@@ -22,20 +21,32 @@ export class RequestComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  displayedColumns: string[] = ['name', 'description', 'enable', 'action'];
+  displayedColumns: string[] = ['name', 'app', 'envs', 'enable', 'action'];
   dataSource: MatTableDataSource<ApiRequestServer>;
 
   environments: Array<ApiServerConfig>;
 
-  constructor(public dialog: MatDialog, private _requestService: RequestService, private _environmentService: EnvironmentService) {
+  constructor(public dialog: MatDialog, private router: Router, private _requestService: RequestService, private _environmentService: EnvironmentService) {
     _environmentService.environments.subscribe({
       next: res => this.environments = res
     });
+    _requestService.requests.subscribe({
+      next: res => {
+        this.dataSource = new MatTableDataSource(res);
+        this.dataSource.filterPredicate = (data: ApiRequestServer, filter) => {
+          const a = !filter || 
+            (data.request.name.toLowerCase().includes(filter.toLowerCase()) 
+            || data.request.description.toLowerCase().includes(filter.toLowerCase()));
+          
+          return a;
+        };
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    });
   }
 
-  ngOnInit(): void {
-    this.getRequests();
-  }
+  ngOnInit(): void {}
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -45,16 +56,6 @@ export class RequestComponent implements OnInit {
     }
   }
 
-  getRequests() {
-    this._requestService.getRequests()
-    .subscribe({
-      next: res => {
-        this.dataSource = new MatTableDataSource(res);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      }
-    });
-  }
 
   remove(element: ApiRequestServer) {
     const dialogRef = this.dialog.open(RemoveDialogComponent);
@@ -72,10 +73,6 @@ export class RequestComponent implements OnInit {
           });
       } 
     });
-  }
-
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
   }
 
   enableChange(element: ApiRequestServer) {
@@ -102,41 +99,22 @@ export class RequestComponent implements OnInit {
   }
 
   launchAll() {
-    var tableElements = this.dataSource.data;
-    this.dialog.open(LaunchDialogComponent, {
-      data: {
-        'tableElements': tableElements,
-        'environments': this.environments
-      }
-    });
+    this.router.navigate(['home/launch']);
   }
 
   add() {
-    const dialogRef = this.dialog.open(AddDialogComponent, {
+    this.dialog.open(AddDialogComponent, {
       data: {
         'environments': this.environments
-      }
-    });
-    dialogRef.afterClosed().subscribe((result: ApiRequestServer) => {
-      if(result) {
-        this.dataSource.data.push(result);
-        this.dataSource._updateChangeSubscription();
       }
     });
   }
 
   update(element: ApiRequestServer) {
-    const dialogRef = this.dialog.open(AddDialogComponent, {
+    this.dialog.open(AddDialogComponent, {
       data: {
         'tableElement': element,
         'environments': this.environments
-      }
-    });
-    dialogRef.afterClosed().subscribe((result: ApiRequestServer) => {
-      if(result) {
-        var index = this.dataSource.data.findIndex(d => d.request.id == result.request.id);
-        this.dataSource.data.splice(index, 1, result)
-        this.dataSource._updateChangeSubscription();
       }
     });
   }

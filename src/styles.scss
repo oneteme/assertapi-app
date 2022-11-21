@@ -12,3 +12,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     margin-right: 1em !important;
     margin-left: 1em !important;
 }
+
+.mat-dialog-content {
+    scrollbar-width: thin;
+}

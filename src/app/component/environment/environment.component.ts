@@ -26,6 +26,16 @@ export class EnvironmentComponent implements OnInit {
     _environmentService.environments.subscribe({
       next: res => {
         this.dataSource = new MatTableDataSource(res);
+        this.dataSource.filterPredicate = (data: ApiServerConfig, filter) => {
+          const a = !filter || 
+            (data.serverConfig.host.toLowerCase().includes(filter.toLowerCase()) 
+            || data.serverConfig.port.toString().includes(filter.toLowerCase())
+            || data.serverConfig.auth.type.toLowerCase().includes(filter.toLowerCase())
+            || data.app.toLowerCase().includes(filter.toLowerCase())
+            || data.env.toLowerCase().includes(filter.toLowerCase()));
+          
+          return a;
+        };
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       }

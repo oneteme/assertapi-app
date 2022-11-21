@@ -1,6 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormControl, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatExpansionPanelHeader } from '@angular/material/expansion';
 import { filter, finalize } from 'rxjs';
 import { ApiServerConfig } from 'src/app/model/environment.model';
 import { ApiRequest, ApiRequestServer, AssertionConfig } from 'src/app/model/request.model';
@@ -11,6 +12,9 @@ import { RequestService } from 'src/app/service/request.service';
   styleUrls: ['./add-dialog.component.scss']
 })
 export class AddDialogComponent implements OnInit {
+
+  @ViewChild('informationPanel', { static: false }) informationPanel: MatExpansionPanelHeader;
+  @ViewChild('bodyPanel', { static: false }) bodyPanel: MatExpansionPanelHeader;
 
   isUpdate: boolean;
 
@@ -24,9 +28,26 @@ export class AddDialogComponent implements OnInit {
     description: new UntypedFormControl('', Validators.required),
     app: new UntypedFormControl('', Validators.required),
     envs: new UntypedFormControl('', Validators.required),
-    headers: new UntypedFormControl(null),
-    body: new UntypedFormControl(null)
+    headers: new FormArray<FormGroup<{key: FormControl<string>, value: FormControl<string>}>>(
+      [
+        new FormGroup({
+          key: new FormControl<string>(''),
+          value: new FormControl<string>('')
+        })
+      ]
+    ),
+    body: new UntypedFormControl(null, jsonValidator())
   });
+
+
+  options = {
+    readOnly: false,
+    scrollbar: {
+      verticalScrollbarSize: 5,
+      horizontalScrollbarSize: 5,
+    },
+    language: 'json'
+  };
 
   constructor(
     public dialogRef: MatDialogRef<AddDialogComponent>,
@@ -60,20 +81,29 @@ export class AddDialogComponent implements OnInit {
         apiRequestServer.request.id = this.data.tableElement.request.id;
         this._service.updateRequest(apiRequestServer)
           .subscribe({
-            next: () => this.dialogRef.close(apiRequestServer)
+            next: () => this.dialogRef.close()
           });
       } else {
         this._service.putRequest(apiRequestServer)
           .subscribe({
-            next: res => {
-              apiRequestServer.request.id = res;
-              this.dialogRef.close(apiRequestServer);
-            }
+            next: () => this.dialogRef.close()
           });
       }
     } else {
+      if(this.body.invalid) {
+        this.bodyPanel.panel.open();
+      } else if (this.method.invalid || this.name.invalid || this.description.invalid || this.uri.invalid || this.app.invalid || this.selectedEnvs.invalid) {
+        this.informationPanel.panel.open();
+      }
       this.formGroup.markAllAsTouched();
     }
+  }
+
+  addHeader() {
+    this.headers.push(new FormGroup({
+      key: new FormControl<string>(''),
+      value: new FormControl<string>('')
+    }));
   }
 
   formToModel(): ApiRequestServer {
@@ -86,6 +116,12 @@ export class AddDialogComponent implements OnInit {
     model.request.body = this.body.value;
     model.request.configuration = new AssertionConfig();
     model.request.configuration.enable = true;
+    model.request.headers = new Map();
+    this.headers.controls.forEach(c => {
+      if(c.get('key').value && c.get('value').value) {
+        if(!model.request.headers[c.get('key').value]) model.request.headers[c.get('key').value] = c.get('value').value;
+      }
+    }); 
     model.requestGroupList = this.selectedEnvs.value.map((v: string) => ({'app': this.app.value, 'env': v}));
     return model;
   }
@@ -98,6 +134,10 @@ export class AddDialogComponent implements OnInit {
     this.body.setValue(data.request.body);
     this.app.setValue(data.requestGroupList[0].app);
     this.selectedEnvs.setValue(data.requestGroupList.map(r => r.env));
+  }
+
+  remove(index: number) {
+    this.headers.removeAt(index);
   }
 
   get method(): AbstractControl | null {
@@ -124,8 +164,8 @@ export class AddDialogComponent implements OnInit {
     return this.formGroup.get('envs');
   }
 
-  get headers(): AbstractControl | null {
-    return this.formGroup.get('headers');
+  get headers(): FormArray<FormGroup<{key: FormControl<string>, value: FormControl<string>}>> {
+    return <FormArray<FormGroup<{key: FormControl<string>, value: FormControl<string>}>>>this.formGroup.get('headers');
   }
 
   get body(): AbstractControl | null {
@@ -136,4 +176,21 @@ export class AddDialogComponent implements OnInit {
 class Data {
   tableElement: ApiRequestServer;
   environments: Array<ApiServerConfig>;
+}
+
+export function jsonValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const error: ValidationErrors = { jsonInvalid: true };
+
+    try {
+      console.log(control.value)
+      control.value ? JSON.parse(control.value) : null;
+    } catch (e) {
+      control.setErrors(error);
+      return error;
+    }
+
+    control.setErrors(null);
+    return null;
+  };
 }

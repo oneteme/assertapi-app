@@ -26,6 +26,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatListModule } from '@angular/material/list'; 
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatRippleModule } from '@angular/material/core'
 import { RemoveDialogComponent as RemoveDialogEnvironmentComponent} from './component/environment/remove-dialog/remove-dialog.component'; 
 import { RemoveDialogComponent as RemoveDialogRequestComponent} from './component/request/remove-dialog/remove-dialog.component'; 
 import { MatDialogModule } from '@angular/material/dialog';
@@ -40,11 +44,15 @@ import { LaunchDialogComponent as LaunchDialogTraceComponent} from './component/
 
 import { AppRoutingModule } from './app-routing.module';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
-import { ComparatorDialogComponent } from './component/trace/comparator-dialog/comparator-dialog.component';
-import { LaunchContentComponent } from './launch-content/launch-content.component';
-import { LaunchDialogComponent } from './component/request/launch-dialog/launch-dialog/launch-dialog.component';
+import { ComparatorDialogComponent as ComparatorDialogTraceComponent } from './component/trace/comparator-dialog/comparator-dialog.component';
+import { ComparatorDialogComponent as ComparatorDialogResultComponent} from './component/result/comparator/comparator.component';
+
+import { LaunchContentComponent } from './component/request/launch-dialog/launch-content/launch-content.component';
 import { ChooseContentComponent } from './component/request/launch-dialog/choose-content/choose-content.component';
 import { ResultContentComponent } from './component/request/launch-dialog/result-content/result-content.component';
+import { ResultComponent } from './component/result/result.component';
+import { ChartComponent } from './component/result/chart/chart.component';
+import { PrettyjsonPipe } from './pipe/json.pipe';
 
 @NgModule({
   declarations: [
@@ -57,13 +65,15 @@ import { ResultContentComponent } from './component/request/launch-dialog/result
     AddDialogEnvironmentComponent,
     AddDialogRequestComponent,
     LaunchDialogRequestComponent,
-    LaunchDialogTraceComponent,
-    ComparatorDialogComponent,
     LaunchContentComponent,
-    LaunchDialogComponent,
     ChooseContentComponent,
     ResultContentComponent,
-    
+    LaunchDialogTraceComponent,
+    ComparatorDialogTraceComponent,
+    ComparatorDialogResultComponent,
+    ResultComponent,
+    ChartComponent,
+    PrettyjsonPipe        
   ],
   imports: [
     AppRoutingModule,
@@ -92,6 +102,10 @@ import { ResultContentComponent } from './component/request/launch-dialog/result
     MatBadgeModule,
     MatListModule,
     MatProgressSpinnerModule,
+    MatSidenavModule,
+    MatCardModule,
+    MatExpansionModule,
+    MatRippleModule,
     MonacoEditorModule.forRoot()
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' }],

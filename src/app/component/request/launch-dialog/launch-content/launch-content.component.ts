@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
 import { distinctUntilChanged, filter } from 'rxjs';
 import { LoginTypeEnum } from 'src/app/model/environment.model';
@@ -10,13 +10,20 @@ import { Configuration, Data } from 'src/app/model/request.model';
   templateUrl: './launch-content.component.html',
   styleUrls: ['./launch-content.component.scss']
 })
-export class LaunchContentComponent implements OnInit {
+export class LaunchContentComponent implements OnInit, AfterViewInit {
+
+  private _data: Data;
 
   @Input() set data(value: Data) {
     if(value) {
+      this._data = value
       this.actualApps = Array.from(new Set(value.environments.filter(e => value.tableElements.map(t => t.requestGroupList[0].app).includes(e.app)).map(d => d.app))).map(a => ({name: a, value: a}));
       this.expectedApps = Array.from(new Set(value.environments.filter(e => value.tableElements.map(t => t.requestGroupList[0].app).includes(e.app)).map(d => d.app))).map(a => ({name: a, value: a}));
     }
+  }
+
+  get data(): Data {
+    return this._data;
   }
 
   @Output() onLaunch = new EventEmitter<any>();
@@ -51,6 +58,10 @@ export class LaunchContentComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    
+  }
+
+  ngAfterViewInit(): void {
     this.actualApp.valueChanges.pipe(
       distinctUntilChanged((prev, curr) => prev == curr),
       filter(form => form != null)
@@ -102,7 +113,7 @@ export class LaunchContentComponent implements OnInit {
         }
         this.configuration.refer = environment;
       }
-    });
+    });  
   }
 
   launch(): void {
@@ -115,7 +126,9 @@ export class LaunchContentComponent implements OnInit {
 
   choose(): void {
     if(this.actualForm.valid && this.expectedForm.valid) {
-      this.onChoose.emit({actualApp: this.actualApp.value, actualEnv: this.actualEnv.value, expectedEnv: this.expectedEnv.value, elements: this.data.tableElements.filter(t => t.requestGroupList[0].app == this.actualApp.value && t.requestGroupList.map(r => r.env).includes(this.actualEnv.value) && t.requestGroupList.map(r => r.env).includes(this.expectedEnv.value))});
+      this.configuration.refer.auth = {...this.configuration.refer.auth, username: this.expectedLoginUsername?.value, password: this.expectedLoginpassword?.value}; 
+      this.configuration.target.auth = {...this.configuration.target.auth, username: this.actualLoginUsername?.value, password: this.actualLoginpassword?.value}; 
+      this.onChoose.emit({actualApp: this.actualApp.value, actualEnv: this.actualEnv.value, expectedEnv: this.expectedEnv.value, configuration: this.configuration, elements: this.data.tableElements.filter(t => t.requestGroupList[0].app == this.actualApp.value && t.requestGroupList.map(r => r.env).includes(this.actualEnv.value) && t.requestGroupList.map(r => r.env).includes(this.expectedEnv.value))});
     } else {
       this.actualForm.markAllAsTouched();
       this.expectedForm.markAllAsTouched();

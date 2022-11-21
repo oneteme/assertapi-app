@@ -8,7 +8,7 @@ export class ServerAuth {
 
 export class ServerConfig {
     host: string;
-    port: string;
+    port: number;
     auth: ServerAuth;
 }
 
