@@ -63,11 +63,11 @@ export class TraceComponent implements OnInit, AfterViewInit {
         this.selection.clear();
         if(res['id']) {
           this.isTestGroup = true;
-          this.displayedColumns = ['name', 'description', 'event', 'envAct', 'envExp', 'result', 'action', 'select'];
+          this.displayedColumns = ['name', 'event', 'envAct', 'envExp', 'result', 'action', 'select'];
           this.getTraces(res['id']);
         } else {
           this.isTestGroup = false;
-          this.displayedColumns = ['name', 'description', 'event', 'envAct', 'envExp', 'result', 'action'];
+          this.displayedColumns = ['name', 'event', 'envAct', 'envExp', 'result', 'action'];
           this.getTraces();
         }
       }

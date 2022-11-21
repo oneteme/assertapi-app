@@ -3,6 +3,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { AppComponent } from "./app.component";
 import { EnvironmentComponent } from "./component/environment/environment.component";
 import { RequestComponent } from "./component/request/request.component";
+import { ResultComponent } from "./component/result/result.component";
 import { TraceComponent } from "./component/trace/trace.component";
 
 export const routes: Routes = [
@@ -11,6 +12,7 @@ export const routes: Routes = [
         children: [
             { path: 'environment', component: EnvironmentComponent },
             { path: 'request', component: RequestComponent },
+            { path: 'launch', component: ResultComponent },
             { path: 'trace', component: TraceComponent },
             { path: '**', redirectTo: 'environment', pathMatch: 'full' }
         ]

@@ -1,4 +1,4 @@
-<div class="menu">
+<!-- <div class="menu">
   <button mat-icon-button [matMenuTriggerFor]="menu">
     <mat-icon>menu</mat-icon>
   </button>
@@ -21,23 +21,33 @@
     </div>
   </div>
   <router-outlet></router-outlet>
-  <!-- <ng-container [ngTemplateOutlet]="templateSelected || request"></ng-container> -->
-
-
-
-  <ng-template #environment>
-    <app-environment></app-environment>
-  </ng-template>
-
-  <ng-template #request>
-    <app-request></app-request>
-  </ng-template>
-
-  <ng-template #trace>
-    <app-trace></app-trace>
-  </ng-template>
-
-</div>
+</div> -->
+<mat-sidenav-container class="sidenav-container" autosize>
+  <mat-sidenav #snav mode="side" opened fixedInViewport>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/home/environment" [routerLinkActive]="'active-item'" matTooltip="Configuration des environnements" matTooltipPosition="right">
+        <div class="menu-item">
+          <mat-icon>settings</mat-icon><div *ngIf="isLarge$ | async">Environnements</div>
+        </div>
+      </a>
+      <a mat-list-item routerLink="/home/request" [routerLinkActive]="'active-item'" matTooltip="Configuration des tests" matTooltipPosition="right">
+        <div class="menu-item">
+          <mat-icon>checklist_rtl</mat-icon><div *ngIf="isLarge$ | async">Tests</div>
+        </div>
+      </a>
+      <a mat-list-item routerLink="/home/trace" [routerLinkActive]="'active-item'" matTooltip="Historique des tests" matTooltipPosition="right">
+        <div class="menu-item">
+          <mat-icon>history</mat-icon><div *ngIf="isLarge$ | async">Historique</div>
+        </div>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content id="ton_element_avec_scroll" #matSidenavContent>
+    <div class="main">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
 
 <mat-menu #menu="matMenu">
   <button mat-menu-item>

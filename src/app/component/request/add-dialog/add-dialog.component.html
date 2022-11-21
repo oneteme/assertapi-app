@@ -1,8 +1,131 @@
-<h2 mat-dialog-title>
+<h2 mat-dialog-title style="display: flex; align-items: center;">
+    <mat-icon class="material-icons-outlined" style="margin-right: 0.5em;">{{isUpdate ? 'edit_note' : 'add' }}</mat-icon>
     {{isUpdate ? 'Modifier le test' : 'Ajouter un test' }}
 </h2>
-<mat-dialog-content class="mat-typography" style="font-size: 12px;">
-    <mat-tab-group mat-stretch-tabs animationDuration="0ms" [formGroup]="formGroup">
+<mat-dialog-content class="mat-typography" style="font-size: 12px; width: 75vw" [formGroup]="formGroup">
+    <mat-accordion class="example-headers-align">
+        <mat-expansion-panel expanded style="margin-bottom: 1em; margin-top: 1em;">
+            <mat-expansion-panel-header #informationPanel>
+                <mat-panel-title>
+                    <mat-icon class="material-icons-outlined" style="margin-right: 0.5em;">info</mat-icon>
+                    Informations
+                </mat-panel-title>
+                <mat-panel-description>
+                    Remplissez les informations de votre API
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div style="margin-bottom: 1em; display: flex; flex-direction: column; height: 220px;">
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="width: 100px;" appearance="fill">
+                        <mat-label>Methode</mat-label>
+                        <mat-select formControlName="method">
+                            <mat-option value="GET">GET</mat-option>
+                            <mat-option value="POST">POST</mat-option>
+                            <mat-option value="PUT">PUT</mat-option>
+                            <mat-option value="PATCH">PATCH</mat-option>
+                            <mat-option value="DELETE">DELETE</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="formGroup.get('method').hasError('required')">La methode est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Uri</mat-label>
+                        <input matInput formControlName="uri">
+                        <mat-error *ngIf="formGroup.get('uri').hasError('required')">L'uri est obligatoire</mat-error>
+                    </mat-form-field>
+                </div>
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Nom de l'api</mat-label>
+                        <input matInput formControlName="name">
+                        <mat-error *ngIf="formGroup.get('name').hasError('required')">Le nom de l'api est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Description</mat-label>
+                        <input matInput formControlName="description">
+                        <mat-error *ngIf="formGroup.get('description').hasError('required')">La description est
+                            obligatoire</mat-error>
+                    </mat-form-field>
+                </div>
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Application</mat-label>
+                        <mat-select formControlName="app">
+                            <mat-option *ngFor="let app of apps" [value]="app.value">{{app.name}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="formGroup.get('app').hasError('required')">L'application est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="flex-grow: 1;" appearance="fill">
+                        <mat-label>Environnement</mat-label>
+                        <mat-select formControlName="envs" multiple>
+                            <mat-option *ngFor="let env of envs" [value]="env.value">{{env.name}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="formGroup.get('envs').hasError('required')">L'environnement est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <mat-accordion class="example-headers-align">
+        <mat-expansion-panel style="margin-bottom: 1em; margin-top: 1em;">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Header
+                </mat-panel-title>
+                <mat-panel-description>
+                    Remplissez le header de votre API
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div style="max-height: 30vh; overflow: auto; scrollbar-width: thin;">
+                <ng-container *ngFor="let header of headers.controls; index as i; first as isFirst">
+                    <div style="display: flex; align-items: center;" [formGroup]="header">
+                        <mat-form-field style="flex-grow: 1;" appearance="fill">
+                            <mat-label>Key</mat-label>
+                            <input matInput formControlName="key">
+                        </mat-form-field>
+                        <mat-form-field style="flex-grow: 1;" appearance="fill">
+                            <mat-label>Value</mat-label>
+                            <input matInput formControlName="value">
+                        </mat-form-field>
+                        <div style="width: 5%;">
+                            <button *ngIf="!isFirst" mat-icon-button color="warn" style="margin-bottom: 1em;" (click)="remove(i)">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </div>
+                        
+                    </div>
+                </ng-container>
+            </div>
+            <mat-action-row>
+                <button mat-button color="primary" (click)="addHeader()">
+                    <div style="display: flex; align-items: center;">
+                        <mat-icon class="material-icons-outlined" style="margin-right: 0.5em;">add</mat-icon>
+                        Ajouter un header
+                    </div>
+                </button>
+            </mat-action-row>
+        </mat-expansion-panel>
+        
+    </mat-accordion>
+    <mat-accordion class="example-headers-align">
+        <mat-expansion-panel style="margin-bottom: 1em; margin-top: 1em;">
+            <mat-expansion-panel-header #bodyPanel>
+                <mat-panel-title>
+                    Body
+                </mat-panel-title>
+                <mat-panel-description>
+                    Remplissez le body de votre API
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <ngx-monaco-editor style="width: 100%; margin-top: 1em;" [options]="options"
+                formControlName="body"></ngx-monaco-editor>
+        </mat-expansion-panel>
+        
+    </mat-accordion>
+    <!-- <mat-tab-group mat-stretch-tabs animationDuration="0ms" [formGroup]="formGroup">
         <mat-tab label="Informations de l'api">
             <div style="padding-top: 1em; display: flex; flex-direction: column; height: 220px;">
                 <div style="margin-bottom: 1em; display: flex;">
@@ -15,7 +138,8 @@
                             <mat-option value="PATCH">PATCH</mat-option>
                             <mat-option value="DELETE">DELETE</mat-option>
                         </mat-select>
-                        <mat-error *ngIf="formGroup.get('method').hasError('required')">La methode est obligatoire</mat-error>
+                        <mat-error *ngIf="formGroup.get('method').hasError('required')">La methode est obligatoire
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Uri</mat-label>
@@ -27,12 +151,14 @@
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Nom de l'api</mat-label>
                         <input matInput formControlName="name">
-                        <mat-error *ngIf="formGroup.get('name').hasError('required')">Le nom de l'api est obligatoire</mat-error>
+                        <mat-error *ngIf="formGroup.get('name').hasError('required')">Le nom de l'api est obligatoire
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Description</mat-label>
                         <input matInput formControlName="description">
-                        <mat-error *ngIf="formGroup.get('description').hasError('required')">La description est obligatoire</mat-error>
+                        <mat-error *ngIf="formGroup.get('description').hasError('required')">La description est
+                            obligatoire</mat-error>
                     </mat-form-field>
                 </div>
                 <div style="margin-bottom: 1em; display: flex;">
@@ -41,31 +167,31 @@
                         <mat-select formControlName="app">
                             <mat-option *ngFor="let app of apps" [value]="app.value">{{app.name}}</mat-option>
                         </mat-select>
-                        <mat-error *ngIf="formGroup.get('app').hasError('required')">L'application est obligatoire</mat-error>
+                        <mat-error *ngIf="formGroup.get('app').hasError('required')">L'application est obligatoire
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field style="flex-grow: 1;" appearance="fill">
                         <mat-label>Environnement</mat-label>
                         <mat-select formControlName="envs" multiple>
                             <mat-option *ngFor="let env of envs" [value]="env.value">{{env.name}}</mat-option>
                         </mat-select>
-                        <mat-error *ngIf="formGroup.get('envs').hasError('required')">L'environnement est obligatoire</mat-error>
+                        <mat-error *ngIf="formGroup.get('envs').hasError('required')">L'environnement est obligatoire
+                        </mat-error>
                     </mat-form-field>
                 </div>
             </div>
         </mat-tab>
         <mat-tab label="Headers">
-            <mat-form-field style="padding-top: 1em; height: 220px; width: 100%;" appearance="fill" >
+            <mat-form-field style="padding-top: 1em; height: 220px; width: 100%;" appearance="fill">
                 <mat-label>Headers</mat-label>
                 <textarea matInput></textarea>
             </mat-form-field>
         </mat-tab>
         <mat-tab label="Body">
-            <mat-form-field style="padding-top: 1em; height: 220px; width: 100%;" appearance="fill" >
-                <mat-label>Body</mat-label>
-                <textarea matInput></textarea>
-            </mat-form-field>
+            <ngx-monaco-editor style="height: 250px; width: 100%; margin-top: 1em;" [options]="options"
+                formControlName="body"></ngx-monaco-editor>
         </mat-tab>
-    </mat-tab-group>
+    </mat-tab-group> -->
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Annuler</button>

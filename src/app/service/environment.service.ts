@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, map, Observable, tap } from "rxjs";
+import { BehaviorSubject, map, Observable, startWith, tap } from "rxjs";
 import { environment } from "src/environments/environment";
 import { ApiServerConfig } from "../model/environment.model";
 import { AssertapiClientService } from "./assertapi-client.service";
