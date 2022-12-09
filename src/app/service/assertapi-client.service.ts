@@ -35,7 +35,7 @@ export class AssertapiClientService {
   }
 }
 
-function filterArgs(args) {
+function  filterArgs(args) {
   let params = Object.assign({}, args);
   Object.keys(params).forEach(key => {
     if (params[key] == null || params[key] == undefined) {

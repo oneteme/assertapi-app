@@ -17,7 +17,7 @@ export class ApiRequest {
     id: number;
     uri: string;
     method: string;
-    headers: Map<string, string>;
+    headers: { [key: string]: string };
     body: string;
     charset: string;
     name: string;

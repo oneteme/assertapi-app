@@ -48,7 +48,16 @@ export class RequestService extends AssertapiClientService {
 
     deleteRequest(ids: number[]): Observable<void> {
         let url: string = `${environment.server}/v1/assert/api/request`;
-        return this.delete(url, { 'id': ids.map(id => id.toString()) });
+        return this.delete(url, { 'id': ids.map(id => id.toString()) }).pipe(
+            tap(() => {
+                var requests = this._requests.value;
+                ids.forEach(id => {
+                    var index = requests.findIndex(d => d.request.id == id);
+                    requests.splice(index, 1);
+                })
+                this._requests.next(requests);
+            })
+        );
     }
 
     enableRequest(ids: number[]): Observable<void> {

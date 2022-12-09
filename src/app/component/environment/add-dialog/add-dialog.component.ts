@@ -50,17 +50,12 @@ export class AddDialogComponent implements OnInit {
         apiServerConfig.id = this.data.id;
         this._service.updateEnvironment(apiServerConfig)
           .subscribe({
-            next: () => {
-              this.dialogRef.close(apiServerConfig)
-            }
+            next: () => this.dialogRef.close()
           });
       } else {
         this._service.putEnvironment(apiServerConfig)
           .subscribe({
-            next: res => {
-              apiServerConfig.id = res;
-              this.dialogRef.close(apiServerConfig);
-            }
+            next: () => this.dialogRef.close()
           });
       }
     } else {

@@ -29,12 +29,7 @@ export class AddDialogComponent implements OnInit {
     app: new UntypedFormControl('', Validators.required),
     envs: new UntypedFormControl('', Validators.required),
     headers: new FormArray<FormGroup<{key: FormControl<string>, value: FormControl<string>}>>(
-      [
-        new FormGroup({
-          key: new FormControl<string>(''),
-          value: new FormControl<string>('')
-        })
-      ]
+      []
     ),
     body: new UntypedFormControl(null, jsonValidator())
   });
@@ -107,6 +102,7 @@ export class AddDialogComponent implements OnInit {
   }
 
   formToModel(): ApiRequestServer {
+    
     let model = new ApiRequestServer();
     model.request = new ApiRequest();
     model.request.method = this.method.value;
@@ -116,10 +112,10 @@ export class AddDialogComponent implements OnInit {
     model.request.body = this.body.value;
     model.request.configuration = new AssertionConfig();
     model.request.configuration.enable = true;
-    model.request.headers = new Map();
+    model.request.headers = {};
     this.headers.controls.forEach(c => {
       if(c.get('key').value && c.get('value').value) {
-        if(!model.request.headers[c.get('key').value]) model.request.headers[c.get('key').value] = c.get('value').value;
+        model.request.headers[c.get('key').value] = c.get('value').value;
       }
     }); 
     model.requestGroupList = this.selectedEnvs.value.map((v: string) => ({'app': this.app.value, 'env': v}));
@@ -134,9 +130,15 @@ export class AddDialogComponent implements OnInit {
     this.body.setValue(data.request.body);
     this.app.setValue(data.requestGroupList[0].app);
     this.selectedEnvs.setValue(data.requestGroupList.map(r => r.env));
+    Object.entries(data.request.headers ?? []).forEach(([value, key]) => {
+      this.headers.push(new FormGroup({
+        key: new FormControl<string>(value),
+        value: new FormControl<string>(key)
+      }));
+    });
   }
 
-  remove(index: number) {
+  removeHeader(index: number) {
     this.headers.removeAt(index);
   }
 
@@ -183,8 +185,7 @@ export function jsonValidator(): ValidatorFn {
     const error: ValidationErrors = { jsonInvalid: true };
 
     try {
-      console.log(control.value)
-      control.value ? JSON.parse(control.value) : null;
+      control.value  ? JSON.parse(control.value) : null;
     } catch (e) {
       control.setErrors(error);
       return error;
