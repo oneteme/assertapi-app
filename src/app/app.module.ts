@@ -39,20 +39,20 @@ import { AddDialogComponent as  AddDialogRequestComponent } from './component/re
 import { MatFormFieldModule } from '@angular/material/form-field';  
 import { DefaultValueAccessor, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-import { LaunchDialogComponent as LaunchDialogRequestComponent} from './component/request/launch-dialog/launch-dialog.component';
-import { LaunchDialogComponent as LaunchDialogTraceComponent} from './component/trace/launch-dialog/launch-dialog.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AppRoutingModule } from './app-routing.module';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
-import { ComparatorDialogComponent as ComparatorDialogTraceComponent } from './component/trace/comparator-dialog/comparator-dialog.component';
-import { ComparatorDialogComponent as ComparatorDialogResultComponent} from './component/result/comparator/comparator.component';
+import { ComparatorDialogComponent as ComparatorDialogResultComponent} from './component/detail/comparator/comparator.component';
 
-import { LaunchContentComponent } from './component/request/launch-dialog/launch-content/launch-content.component';
-import { ChooseContentComponent } from './component/request/launch-dialog/choose-content/choose-content.component';
-import { ResultContentComponent } from './component/request/launch-dialog/result-content/result-content.component';
-import { ResultComponent } from './component/result/result.component';
+import { ResultView } from './component/result/result.view';
 import { ChartComponent } from './component/result/chart/chart.component';
 import { PrettyjsonPipe } from './pipe/json.pipe';
+import { IconLabelComponent } from './shared/component/icon-label.component';
+import { IconComponent } from './shared/component/icon.component';
+import { IconButtonComponent } from './shared/component/icon-button.component';
+import { LaunchComponent } from './component/launch/launch.component';
+import { DetailComponent } from './component/detail/detail.component';
 
 @NgModule({
   declarations: [
@@ -64,16 +64,17 @@ import { PrettyjsonPipe } from './pipe/json.pipe';
     EnvironmentComponent,
     AddDialogEnvironmentComponent,
     AddDialogRequestComponent,
-    LaunchDialogRequestComponent,
-    LaunchContentComponent,
-    ChooseContentComponent,
-    ResultContentComponent,
-    LaunchDialogTraceComponent,
-    ComparatorDialogTraceComponent,
     ComparatorDialogResultComponent,
-    ResultComponent,
+    ResultView,
     ChartComponent,
-    PrettyjsonPipe        
+    LaunchComponent,
+    PrettyjsonPipe,
+    // SHARED
+    IconComponent,
+    IconLabelComponent,  
+    IconButtonComponent, 
+    LaunchComponent,
+    DetailComponent      
   ],
   imports: [
     AppRoutingModule,
@@ -106,6 +107,7 @@ import { PrettyjsonPipe } from './pipe/json.pipe';
     MatCardModule,
     MatExpansionModule,
     MatRippleModule,
+    MatProgressBarModule,
     MonacoEditorModule.forRoot()
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' }],

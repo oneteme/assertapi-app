@@ -1,0 +1,60 @@
+.example-headers-align .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+}
+
+mat-form-field:not(:first-child) {
+    margin-left: 1em;
+}
+
+table {
+    width: 100%;
+}
+
+.header-page {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1em;
+
+    .title {
+        display: flex;
+
+        .icon {
+            align-items: center;
+            margin-right: 1em;
+
+            .mat-icon {
+                font-size: 35px;
+                height: 35px;
+                width: 35px;
+            }
+        }
+
+        .label {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+
+            .title {
+                font-size: 1.28571429rem;
+            }
+
+            .sub-title {
+                font-size: 1rem;
+                color: rgba(0, 0, 0, .6);
+                font-style: italic;
+            }
+        }
+    }
+}
+
+.action-right {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    right: 0;
+    bottom: 0;
+    margin: 1em;
+}

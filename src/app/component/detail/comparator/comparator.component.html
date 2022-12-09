@@ -1,0 +1,48 @@
+<h2 mat-dialog-title>
+    Comparaison des reponses
+</h2>
+<mat-dialog-content class="mat-typography">
+    
+    <mat-accordion class="example-headers-align">
+        <mat-expansion-panel>
+            <mat-expansion-panel-header #requestPanelHeader>
+                <mat-panel-title>
+                    <mat-icon class="material-icons-outlined" style="margin-right: 0.5em;">info</mat-icon>
+                    {{request.method}}
+                </mat-panel-title>
+                <mat-panel-description>
+                    {{request.uri}}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div style="display: flex;">
+                <div style="width: 50%;">
+                    <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 1em;">
+                        <mat-divider style="display: flex; flex-grow: 1; margin-right: 1em;"></mat-divider>
+                        <div style="font-weight: bold; font-size: 16px;">Headers</div>
+                        <mat-divider style="display: flex; flex-grow: 1; margin-left: 1em;"></mat-divider>
+                    </div>
+                    <ngx-monaco-editor style="width: 100%; margin-top: 1em;" [options]="editorOptions"
+                    [(ngModel)]="request.body"></ngx-monaco-editor>
+                </div>
+                <div style="width: 50%;">
+                    <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 1em;">
+                        <mat-divider style="display: flex; flex-grow: 1; margin-right: 1em;"></mat-divider>
+                        <div style="font-weight: bold; font-size: 16px;">Body</div>
+                        <mat-divider style="display: flex; flex-grow: 1; margin-left: 1em;"></mat-divider>
+                    </div>
+                    <ngx-monaco-editor style="width: 100%; margin-top: 1em;" [options]="editorOptions"
+                        [(ngModel)]="request.body"></ngx-monaco-editor>
+                </div>
+                
+                
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <ngx-monaco-diff-editor style="height: 250px; width: 75vw; margin-top: 1em;" [options]="options"
+        [originalModel]="originalModel" [modifiedModel]="modifiedModel"></ngx-monaco-diff-editor>
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Fermer</button>
+</mat-dialog-actions>

@@ -1,5 +1,5 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -52,30 +52,13 @@ export class EnvironmentComponent implements OnInit {
     }
   }
 
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
-  }
-
   add() {
-    const dialogRef = this.dialog.open(AddDialogComponent);
-    dialogRef.afterClosed().subscribe((result: ApiServerConfig) => {
-      if(result) {
-        this.dataSource.data.push(result);
-        this.dataSource._updateChangeSubscription();
-      }
-    });
+    this.dialog.open(AddDialogComponent);
   }
 
   update(element: ApiServerConfig) {
-    const dialogRef = this.dialog.open(AddDialogComponent, {
+    this.dialog.open(AddDialogComponent, {
       data: element
-    });
-    dialogRef.afterClosed().subscribe((result: ApiServerConfig) => {
-      if(result) {
-        var index = this.dataSource.data.findIndex(d => d.id == result.id);
-        this.dataSource.data.splice(index, 1, result)
-        this.dataSource._updateChangeSubscription();
-      }
     });
   }
 
@@ -84,15 +67,7 @@ export class EnvironmentComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if(result === "remove") {
         this._environmentService.deleteEnvironment([element.id])
-          .subscribe({
-            next: () => {
-              let index = this.dataSource.data.findIndex(d => d.id === element.id);
-              if(index !== -1) {
-                this.dataSource.data.splice(index, 1);
-                this.dataSource._updateChangeSubscription();
-              }
-            }
-          });
+          .subscribe();
       } 
     });
   }

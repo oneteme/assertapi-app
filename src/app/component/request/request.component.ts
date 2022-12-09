@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { RemoveDialogComponent } from './remove-dialog/remove-dialog.component';
 import { AddDialogComponent } from './add-dialog/add-dialog.component';
 import { ApiServerConfig } from 'src/app/model/environment.model';
-import { LaunchDialogComponent } from './launch-dialog/launch-dialog.component';
 import { RequestService } from 'src/app/service/request.service';
 import { EnvironmentService } from 'src/app/service/environment.service';
 import { Router } from '@angular/router';
@@ -62,15 +61,7 @@ export class RequestComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if(result === "remove") {
         this._requestService.deleteRequest([element.request.id])
-          .subscribe({
-            next: () => {
-              let index = this.dataSource.data.findIndex(d => d.request.id === element.request.id);
-              if(index !== -1) {
-                this.dataSource.data.splice(index, 1);
-                this.dataSource._updateChangeSubscription();
-              }
-            }
-          });
+          .subscribe();
       } 
     });
   }
@@ -87,15 +78,6 @@ export class RequestComponent implements OnInit {
           next: () => element.request.configuration.enable = true
         });
     }
-  }
-
-  launch(element: ApiRequestServer) {
-    this.dialog.open(LaunchDialogComponent, {
-      data: {
-        'tableElements': [element],
-        'environments': this.environments
-      }
-    });
   }
 
   launchAll() {

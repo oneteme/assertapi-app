@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import exporting from 'highcharts/modules/exporting';
 import * as Highcharts from 'highcharts/highcharts';
 
@@ -9,86 +9,85 @@ require('highcharts/modules/solid-gauge')(Highcharts);
 require('highcharts/modules/accessibility')(Highcharts);
 
 @Component({
-  selector: 'app-chart',
+  selector: 'chart',
   styleUrls: ['./chart.component.scss'],
   template: `<div id='chart-container'></div>`,
 })
 export class ChartComponent implements OnInit {
+  @Output() onClick: EventEmitter<Highcharts.Point> = new EventEmitter();
+
   private chart: Highcharts.Chart;
 
-  constructor() { 
+  constructor() {
     exporting(Highcharts);
   }
 
   ngOnInit(): void {
     this.chart = Highcharts.chart('chart-container', {
       chart: {
-        type: 'solidgauge',
-        height: '125px'
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie',
+        height: 200
       },
       title: null,
-      pane: {
-        center: ['50%', '85%'],
-        size: '140%',
-        startAngle: -90,
-        endAngle: 90,
-        background: [{
-          backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
-          innerRadius: '60%',
-          outerRadius: '100%',
-          shape: 'arc'
-        }]
-      },
-      exporting: {
-        enabled: false
-      },
       tooltip: {
-        enabled: false
+        enabled: false, 
+        pointFormat: '<b>{point.percentage:.1f}%</b>'
       },
-      yAxis: {
-        lineWidth: 0,
-        tickWidth: 0,
-        minorTickInterval: null,
-        tickAmount: 2,
-        labels: {
-          y: 16
-        },
-        min: 0,
-        max: 100
+      accessibility: {
+        point: {
+          valueSuffix: '%'
+        }
       },
-
       plotOptions: {
-        solidgauge: {
+        series: {
+          events: {
+            click: this.emitOnClick.bind(this)
+          }
+        },
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
           dataLabels: {
-            y: 5,
-            borderWidth: 0,
-            useHTML: true
+            enabled: true,
+            format: '<b>{point.name}</b>'
           }
         }
       },
-
       credits: {
         enabled: false
       },
-
+      exporting: {
+        enabled: false
+      }, 
+      legend: {
+        align: 'right',
+        verticalAlign: 'middle',
+        layout: 'vertical'
+      },
       series: [{
-        type: 'solidgauge',
-        data: [0],
-        dataLabels: {
-            format:
-                '<div style="text-align:center">' +
-                '<span style="font-size:20px">{y}</span><br/>' +
-                '<span style="font-size:12px;opacity:0.4">%</span>' +
-                '</div>'
-        },
-        tooltip: {
-            valueSuffix: ' %'
-        }
+        type: 'pie',
+        data: []
       }]
     });
   }
 
-  update(val: number, redraw: boolean) {
-    this.chart.series[0].points[0].update(val, redraw);
+  emitOnClick($event: Highcharts.SeriesClickEventObject) {
+    setTimeout(() => {
+      console.log("chart", $event.point.selected);
+      this.onClick.emit($event.point);
+    })
+    
+  }
+
+  update(points: Array<{id: string, name: string, y: number, color: string}>) {
+    this.chart.series[0].setData(points.filter(p => p.y > 0), true);
+  }
+
+  showLoading(show: boolean) {
+    if(show) this.chart.showLoading();
+    else this.chart.hideLoading();
   }
 }

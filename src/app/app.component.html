@@ -40,6 +40,11 @@
           <mat-icon>history</mat-icon><div *ngIf="isLarge$ | async">Historique</div>
         </div>
       </a>
+      <a mat-list-item routerLink="/home/launch" [routerLinkActive]="'active-item'" matTooltip="Lancement des tests" matTooltipPosition="right">
+        <div class="menu-item">
+          <mat-icon>launch</mat-icon><div *ngIf="isLarge$ | async">Historique</div>
+        </div>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content id="ton_element_avec_scroll" #matSidenavContent>

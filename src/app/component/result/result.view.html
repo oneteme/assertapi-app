@@ -1,0 +1,54 @@
+<div class="content">
+    <div class="header-page">
+        <div class="title">
+            <div class="icon">
+                <mat-icon class="material-icons-outlined">desktop_windows</mat-icon>
+            </div>
+            <div class="label">
+                <div class="title">Resultat du lancement</div>
+                <div class="sub-title" *ngIf="ctx">{{ctx.user}} le {{idGroup | date: 'dd/MM/yyyy à hh:ss:mm'}}</div>
+            </div>
+        </div>
+    </div>
+    <mat-progress-bar style="margin-bottom: 1em;" [value]="progress">
+    </mat-progress-bar>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1em; gap: 1em">
+        <div style="width: 50%;">
+            <mat-card>
+                <chart (onClick)="onChartClick($event)"></chart>
+            </mat-card>
+        </div>
+        <div style="width: 50%;">
+            <mat-card style="height: 200px;">
+                
+            </mat-card>
+        </div>
+    
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1em; gap: 1em">
+        <div style="width: 50%;">
+            <mat-card style="height: 200px;">
+                
+            </mat-card>
+        </div>
+        <div style="width: 50%;">
+            <mat-card style="height: 200px;">
+                
+            </mat-card>
+        </div>
+    
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1em; gap: 1em;">
+        <div style="width: 50%;">
+            <mat-card style="height: 200px;">
+                
+            </mat-card>
+        </div>
+        <div style="width: 50%;">
+            <mat-card style="height: 200px;">
+                
+            </mat-card>
+        </div>
+    
+    </div>
+</div>
