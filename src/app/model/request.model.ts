@@ -1,9 +1,16 @@
-class AssertionConfig {
+import { ApiServerConfig, ServerConfig } from "./environment.model";
+
+export class AssertionConfig {
     debug: boolean;
     enable: boolean;
     strict: boolean;
     parallel: boolean;
     excludePaths: string[];
+}
+
+export class ApiRequestGroupServer {
+    app: string;
+    env: string;
 }
 
 export class ApiRequest {
@@ -20,5 +27,15 @@ export class ApiRequest {
 
 export class ApiRequestServer {
     request: ApiRequest;
-    metadata: Map<String, String>;
+    requestGroupList: Array<ApiRequestGroupServer>;
+}
+
+export class Configuration {
+    refer: ServerConfig;
+    target: ServerConfig;
+}
+
+export class Data {
+    tableElements: Array<ApiRequestServer>;
+    environments: Array<ApiServerConfig>;
 }

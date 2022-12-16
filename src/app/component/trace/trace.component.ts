@@ -1,22 +1,17 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { DatePipe } from '@angular/common';
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ApiServerConfig } from 'src/app/model/environment.model';
 import { ApiAssertionsResultServer } from 'src/app/model/trace.model';
-import { AssertapiServerService } from 'src/app/service/assertapi-server.service';
-
-
-interface TableElement {
-  id: number;
-  name: string;
-  description: string;
-  event: string;
-  envAct: string;
-  envExp: string;
-  result: string;
-}
+import { EnvironmentService } from 'src/app/service/environment.service';
+import { TraceService } from 'src/app/service/trace.service';
+import { ComparatorDialogComponent } from './comparator-dialog/comparator-dialog.component';
+import { LaunchDialogComponent } from './launch-dialog/launch-dialog.component';
 
 const STATUS: { [key: string]: Object } = {
   OK: {
@@ -47,31 +42,56 @@ export class TraceComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-  private datePipe: DatePipe = new DatePipe("fr-FR");
-
   status = STATUS;
-  displayedColumns: string[] = ['name', 'description', 'event', 'envAct', 'envExp', 'result', 'action'];
-  dataSource: MatTableDataSource<TableElement>;
-  selection = new SelectionModel<TableElement>(true, []);
+  displayedColumns: string[];
+  dataSource: MatTableDataSource<ApiAssertionsResultServer>;
+  selection = new SelectionModel<ApiAssertionsResultServer>(true, []);
 
-  // @Input() set data(value: Array<ApiAssertionsResultServer>) {
-  //   if(value) {
-  //     this.dataSource = new MatTableDataSource(
-  //       value.map(v => ({id: v.request.id, name: v.request.name, description: v.request.description, event: this.datePipe.transform(new Date(v.result.id), 'dd/MM/yyyy HH:mm:ss'), envAct: v.result.actExecution.host, envExp: v.result.expExecution.host, result: v.result.status}))
-  //     );
-  //     this.dataSource.paginator = this.paginator;
-  //     this.dataSource.sort = this.sort;
-  //   }
-  // }
+  isTestGroup: boolean;
 
-  constructor(private _service: AssertapiServerService) { }
+  environments: Array<ApiServerConfig>;
+
+  constructor(public dialog: MatDialog, private _traceService: TraceService, private _environmentService: EnvironmentService, private router: Router, private activatedRoute: ActivatedRoute) {
+    _environmentService.environments.subscribe({
+      next: res => this.environments = res
+    });
+  }
 
   ngOnInit(): void {
-    this.getTraces();
+    this.activatedRoute.queryParams.subscribe(
+      res => {
+        this.selection.clear();
+        if(res['id']) {
+          this.isTestGroup = true;
+          this.displayedColumns = ['name', 'description', 'event', 'envAct', 'envExp', 'result', 'action', 'select'];
+          this.getTraces(res['id']);
+        } else {
+          this.isTestGroup = false;
+          this.displayedColumns = ['name', 'description', 'event', 'envAct', 'envExp', 'result', 'action'];
+          this.getTraces();
+        }
+      }
+    )
+    
   }
 
   ngAfterViewInit(): void {
     
+  }
+
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.filter(d => d.result.status != 'OK').length;
+    return numSelected === numRows;
+  }
+
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+      return;
+    }
+
+    this.selection.select(...this.filterNotOK());
   }
 
   applyFilter(event: Event) {
@@ -82,20 +102,49 @@ export class TraceComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getTraces() {
-    this._service.traces()
+  getTraces(id?: number) {
+    this._traceService.getTrace(id)
       .subscribe({
         next: res => {
-          this.dataSource = new MatTableDataSource(
-            res.map(v => ({id: v.request.id, name: v.request.name, description: v.request.description, event: this.datePipe.transform(new Date(v.result.id), 'dd/MM/yyyy HH:mm:ss'), envAct: v.result.actExecution.host, envExp: v.result.expExecution.host, result: v.result.status}))
-          );
+          this.dataSource = new MatTableDataSource(res);
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
         }
       });
   }
 
-  run(element: TableElement) {
-    console.log(`Lancement du test numéro ${element.id}`)
+  refresh(){
+    this.router.navigate(['home/trace']);
+  }
+
+  launch(element: ApiAssertionsResultServer) {
+    this.dialog.open(LaunchDialogComponent, {
+      data: {
+        'tableElements': [element],
+        'environments': this.environments
+      }
+    });
+  }
+
+  launchAll() {
+    var elements = this.selection.selected?.length ? this.selection.selected : this.filterNotOK();
+    this.dialog.open(LaunchDialogComponent, {
+      data: {
+        'tableElements': elements,
+        'environments': this.environments
+      }
+    });
+  }
+
+  compare(element: ApiAssertionsResultServer) {
+    element.result.step = "RESPONSE_CONTENT";
+    console.log(element)
+    this.dialog.open(ComparatorDialogComponent, {
+      data: element
+    });
+  }
+
+  filterNotOK(): Array<ApiAssertionsResultServer> {
+    return this.dataSource?.data.filter(d => d.result.status != 'OK');
   }
 }

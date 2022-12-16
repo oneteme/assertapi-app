@@ -1,7 +1,5 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
-import { ApiRequestServer } from './model/request.model';
-import { ApiAssertionsResultServer } from './model/trace.model';
-import { AssertapiServerService } from './service/assertapi-server.service';
+import { Component, OnInit } from '@angular/core';
+import { EnvironmentService } from './service/environment.service';
 
 @Component({
   selector: 'app-root',
@@ -9,32 +7,10 @@ import { AssertapiServerService } from './service/assertapi-server.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  templateSelected    : TemplateRef<any>;
-  requests: Array<ApiRequestServer>;
-  traces: Array<ApiAssertionsResultServer>;
 
-  constructor(private _service: AssertapiServerService) { }
+  constructor(private environmentService: EnvironmentService) { }
 
   ngOnInit(): void {
-    this.getRequests();
-    this.getTraces();
-  }
-
-  getRequests() {
-    this._service.requests()
-    .subscribe({
-      next: res => {
-        this.requests = res;
-      }
-    });
-  }
-
-  getTraces() {
-    this._service.traces()
-      .subscribe({
-        next: res => {
-          this.traces = res;
-        }
-      });
+    this.environmentService.getEnvironments().subscribe();
   }
 }
