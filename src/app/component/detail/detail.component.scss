@@ -59,3 +59,11 @@ mat-form-field:not(:first-child) {
         }
     }
 }
+
+.action-right {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    right: 0;
+    margin: 1em;
+}

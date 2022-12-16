@@ -14,6 +14,8 @@ import { MatSort } from '@angular/material/sort';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { ServerSentEventService } from 'src/app/service/server-sent-event.service';
+import { MainService } from 'src/app/service/main.service';
+import { TraceService } from 'src/app/service/trace.service';
 
 @Component({
   templateUrl: './launch.component.html',
@@ -65,7 +67,7 @@ export class LaunchComponent implements OnInit, AfterViewInit {
   chooseDataSource: MatTableDataSource<ApiRequestServer> = new MatTableDataSource([]);
   chooseSelection = new SelectionModel<ApiRequestServer>(true, []);
 
-  constructor(private _requestService: RequestService, private _environmentService: EnvironmentService, private sseService: ServerSentEventService, private router: Router) { 
+  constructor(private _service: MainService, private _requestService: RequestService, private _traceService: TraceService, private _environmentService: EnvironmentService, private router: Router) { 
     combineLatest([
       this._requestService.requests,
       this._environmentService.environments
@@ -158,19 +160,10 @@ export class LaunchComponent implements OnInit, AfterViewInit {
       this.configuration.refer.auth = { ...this.configuration.refer.auth, username: this.expectedLoginUsername?.value, password: this.expectedLoginpassword?.value };
       this.configuration.target.auth = { ...this.configuration.target.auth, username: this.actualLoginUsername?.value, password: this.actualLoginpassword?.value };
       var disabledIds = this.chooseSelection.selected.length ? this.chooseSelection.selected.map(s => s.request.id) : null;
-      const eventSource = new EventSource(`${environment.server}/v1/assert/api/progress?app=${this.actualApp.value}&actual_env=${this.actualEnv.value}&expected_env=${this.expectedEnv.value}`);
-      eventSource.onopen = (event) => {
-        console.log("connection opened", event);
-      };
-      eventSource.onerror = (event) => {
-        eventSource.close();
-      };
-      eventSource.addEventListener("GROUP_ID", (id) => {
-        eventSource.addEventListener(`ctx ${JSON.parse(id.data)}`, (ctx) => {
-          this.router.navigate(['home/launch', JSON.parse(id.data)]);
-          this.sseService.process({evntSource: eventSource, context: JSON.parse(ctx.data), app: this.actualApp.value, actualEnv: this.actualEnv.value, expectedEnv: this.expectedEnv.value, disabledIds: disabledIds, configuration: this.configuration});
-        })
-      });
+      this._service.run(this.actualApp.value, this.actualEnv.value, this.expectedEnv.value, disabledIds, true, this.configuration)
+        .subscribe(
+          res => this.router.navigate(['home/launch', res])
+        );
     } else {
       this.actualForm.markAllAsTouched();
       this.expectedForm.markAllAsTouched();
@@ -187,7 +180,7 @@ export class LaunchComponent implements OnInit, AfterViewInit {
 
   isChooseAllSelected() {
     const numSelected = this.chooseSelection.selected.length;
-    const numRows = this.chooseDataSource.data.length;;
+    const numRows = this.chooseDataSource.data.length;
     return numSelected === numRows;
   }
 

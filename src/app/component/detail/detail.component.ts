@@ -9,7 +9,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, distinctUntilChanged, filter } from 'rxjs';
 import { ApiRequest, Configuration } from 'src/app/model/request.model';
-import { ApiAssertionsResultServer, AssertionContext } from 'src/app/model/trace.model';
+import { AssertionResultServer, AssertionContext, ApiTraceGroup } from 'src/app/model/trace.model';
 import { MainService } from 'src/app/service/main.service';
 import { TraceService } from 'src/app/service/trace.service';
 import { ResultGroup } from '../result/result.view';
@@ -50,11 +50,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
   @ViewChild('resultPaginator', { static: true }) resultPaginator: MatPaginator;
   @ViewChild('resultSort', { static: true }) resultSort: MatSort;
 
-  configuration: Configuration = new Configuration();
-  ctx: AssertionContext;
-  resultDisplayedColumns: string[] = ['name', 'expand'];
+  configuration: Configuration;
+  traceGroup: ApiTraceGroup;
+  resultDisplayedColumns: string[] = ['name', 'expand', 'select'];
   resultDataSource: MatTableDataSource<ResultGroup> = new MatTableDataSource([]);
-  resultSelection = new SelectionModel<ApiAssertionsResultServer>(true, []);
+  resultSelection = new SelectionModel<ResultGroup>(true, []);
   expandedElement: ResultGroup | null;
 
   filterForm = new FormGroup<{ filter: FormControl<string>, status: FormControl<Array<string>> }>({
@@ -65,23 +65,25 @@ export class DetailComponent implements OnInit, AfterViewInit {
   status = STATUS;
 
   idGroup: number;
-  constructor(private _service: MainService, private _traceService: TraceService, private _activatedRoute: ActivatedRoute, private _router: Router, private dialog: MatDialog) { }
+  constructor(private _service: MainService, private _traceService: TraceService, private router: Router, private _activatedRoute: ActivatedRoute, private _router: Router, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     // this.resultDataSource.filterPredicate = (data: ResultGroup, filter) => {
-    //   const a = !filter['filter'] || 
-    //     (data..request.name.toLowerCase().includes(filter['filter'].toLowerCase()) 
-    //     || data.request.description.toLowerCase().includes(filter['filter'].toLowerCase()) 
-    //     || data.result?.status.toLowerCase().includes(filter['filter'].toLowerCase()));
-    //   const b = !filter['status']?.length || filter['status'].some(s => data.result?.status == s); 
+    //   const a = !filter || 
+    //     (data.results.request.name.toLowerCase().includes(filter.toLowerCase()) 
+    //     || data.request.description.toLowerCase().includes(filter.toLowerCase()) 
+    //     || data.result?.status.toLowerCase().includes(filter.toLowerCase()));
 
-    //   return a && b;
+    //   return a;
     // };
 
     // this.filterForm.valueChanges.subscribe(value => {
     //   const filter = value as string;
     //   this.resultDataSource.filter = filter;
     // });
+    this._service.$configuration.subscribe(
+      res => this.configuration = res
+    )
     
     combineLatest([
       this._activatedRoute.params,
@@ -94,9 +96,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this._traceService.getTraceGroup(params['id'])
         ]).subscribe(
             ([traces, traceGroup]) => {
-              this.ctx = new AssertionContext();
-              this.ctx.user = traceGroup.user;
-              this.idGroup = traceGroup.id;
+              this.traceGroup = traceGroup;
               var resultGroups = traces.reduce((prev, current) => {
                 let groupIndex = prev.findIndex(a => a.name == current.request.name);
                 if (groupIndex != -1) {
@@ -138,7 +138,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   isResultAllSelected() {
     const numSelected = this.resultSelection.selected.length;
-    const numRows = this.filterNotOK().length;
+    const numRows = this.resultDataSource.data.length;
     return numSelected === numRows;
   }
 
@@ -148,10 +148,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.resultSelection.select(...this.filterNotOK());
+    this.resultSelection.select(...this.resultDataSource.data);
   }
 
-  filterNotOK(): Array<ApiAssertionsResultServer> {
+  filterNotOK(): Array<AssertionResultServer> {
     return null;
     // return this.resultDataSource?.data.filter(d => d.result && d.result?.status != 'OK');
   }
@@ -167,5 +167,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
         });
       }
     });
+  }
+
+  replay() {
+    this._service.run(this.traceGroup.app, this.traceGroup.actualEnv, this.traceGroup.expectedEnv, this.resultSelection.selected.flatMap(s => s.results.map(r => r.request.id)), false, this.configuration)
+      .subscribe(
+        res => this.router.navigate(['home/launch', res])
+      );
   }
 }

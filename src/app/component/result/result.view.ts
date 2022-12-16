@@ -14,7 +14,7 @@ import { combineLatest, distinctUntilChanged, filter, forkJoin } from 'rxjs';
 import { ApiServerConfig, LoginTypeEnum } from 'src/app/model/environment.model';
 import { LaunchForm, LoginForm } from 'src/app/model/form.model';
 import { ApiRequest, ApiRequestServer, Configuration } from 'src/app/model/request.model';
-import { ApiAssertionsResult, ApiAssertionsResultServer, ApiExecution, AssertionContext, ResponseComparator } from 'src/app/model/trace.model';
+import { AssertionResult, AssertionResultServer, RequestExecution, ApiTraceGroup, AssertionContext, ResponseComparator } from 'src/app/model/trace.model';
 import { EnvironmentService } from 'src/app/service/environment.service';
 import { MainService } from 'src/app/service/main.service';
 import { RequestService } from 'src/app/service/request.service';
@@ -47,7 +47,7 @@ export class ResultView implements OnInit, AfterViewInit {
   @ViewChild(ChartComponent, { static: true }) chart: ChartComponent;
 
   configuration: Configuration = new Configuration();
-  ctx: AssertionContext;
+  apiTraceGroup: ApiTraceGroup;
   resultGroups: Array<ResultGroup> = [];
 
   status = STATUS;
@@ -60,7 +60,7 @@ export class ResultView implements OnInit, AfterViewInit {
 
   idGroup: number;
 
-  constructor(private sseService: ServerSentEventService, private _service: MainService, private _traceService: TraceService, public dialog: MatDialog, private activatedRoute: ActivatedRoute, private router: Router) {
+  constructor(private _traceService: TraceService, public dialog: MatDialog, private activatedRoute: ActivatedRoute, private router: Router) {
 
   }
 
@@ -68,94 +68,29 @@ export class ResultView implements OnInit, AfterViewInit {
     this.activatedRoute.params.subscribe(res => {
       if (res['id']) {
         this.idGroup = res['id'];
-        if (this.sseService.watch() != undefined) {
-          this.sseService.watch().subscribe(
-            result => {
-              this.ctx = result.context;
+        this._traceService.getTraceGroup(this.idGroup).subscribe(
+          res => {
+            this.apiTraceGroup = res;
+            if (this.apiTraceGroup.status == 'PENDING') {
+              const eventSource = new EventSource(`${environment.server}/v1/assert/api/subscribe?ctx=${this.idGroup}`);
 
-              console.log("watch", result)
-              result.evntSource.addEventListener(`nb tests launch ${this.idGroup}`, (event) => {
-                this.nbTests = JSON.parse(event.data);
-
-                console.log(`Nombre tests: ${JSON.parse(event.data)}`);
+              eventSource.addEventListener("result", result => {
+                this.apiTraceGroup = JSON.parse(result.data);
+                this.updateChart();
+                console.log("result", this.apiTraceGroup, this.progress);
               });
 
-              result.evntSource.addEventListener(`result ${this.idGroup}`, (event) => {
-                const apiResult: ApiAssertionsResult = JSON.parse(event.data);
-                switch (apiResult.status) {
-                  case 'SKIP': {
-                    this.nbTestsSkip++;
-                    break;
-                  }
-                  case 'KO': {
-                    this.nbTestsFail++;
-                    break;
-                  }
-                  case 'FAIL': {
-                    this.nbTestsFail++;
-                    break;
-                  }
-                  case 'OK': {
-                    this.nbTestsOK++;
-                    break;
-                  }
-                }
-                this.progress = ((this.nbTestsFail + this.nbTestsSkip + this.nbTestsOK) / this.nbTests) * 100;
-                this.chart.showLoading(false);
-                this.chart.update([{
-                  id: 'OK',
-                  name: `Test Passant (${this.nbTestsOK}/${this.nbTests})`,
-                  y: (this.nbTestsOK / this.nbTests) * 100,
-                  color: this.status['OK']['color']
-                }, {
-                  id: 'KO',
-                  name: `Test Non Passant (${this.nbTestsFail}/${this.nbTests})`,
-                  y: (this.nbTestsFail / this.nbTests) * 100,
-                  color: this.status['KO']['color']
-                }, {
-                  id: 'SKIP',
-                  name: `Test Désactivé (${this.nbTestsSkip}/${this.nbTests})`,
-                  y: (this.nbTestsSkip / this.nbTests) * 100,
-                  color: this.status['SKIP']['color']
-                }]);
-              });
-
-              this._service.run(this.idGroup, result.app, result.actualEnv, result.expectedEnv, null, result.disabledIds, result.configuration)
-                .subscribe();
+              eventSource.onopen = (event) => {
+                console.log("connection opened", event);
+              };
+              eventSource.onerror = (event) => {
+                eventSource.close();
+              };
+            } else {
+              this.updateChart();
             }
-          );
-        } else {
-          this._traceService.getTraceGroup(this.idGroup)
-            .subscribe(
-              res => {
-                this.ctx = new AssertionContext();
-                this.ctx.user = res.user;
-                this.progress = 100;
-                this.nbTests = res.nbTest;
-                this.nbTestsSkip = res.nbTestDisable;
-                this.nbTestsOK = res.nbTestOk;
-                this.nbTestsFail = this.nbTests - (this.nbTestsSkip + this.nbTestsOK);
-                this.chart.showLoading(false);
-                this.chart.update([{
-                  id: 'OK',
-                  name: `Test Passant (${this.nbTestsOK}/${this.nbTests})`,
-                  y: (this.nbTestsOK / this.nbTests) * 100,
-                  color: this.status['OK']['color']
-                }, {
-                  id: 'KO',
-                  name: `Test Non Passant (${this.nbTestsFail}/${this.nbTests})`,
-                  y: (this.nbTestsFail / this.nbTests) * 100,
-                  color: this.status['KO']['color']
-                }, {
-                  id: 'SKIP',
-                  name: `Test Désactivé (${this.nbTestsSkip}/${this.nbTests})`,
-                  y: (this.nbTestsSkip / this.nbTests) * 100,
-                  color: this.status['SKIP']['color']
-                }]);
-              }
-            );
-        }
-
+          }
+        )
       }
     });
   }
@@ -169,14 +104,37 @@ export class ResultView implements OnInit, AfterViewInit {
       this.router.navigate(['home/launch', this.idGroup, 'detail'], { queryParams: { status: $event.options.id } })
     }
   }
+
+  updateChart() {
+    console.log(this.apiTraceGroup)
+    this.progress = ((this.apiTraceGroup.nbTestKo + this.apiTraceGroup.nbTestSkip + this.apiTraceGroup.nbTestOk) / this.apiTraceGroup.nbTest) * 100;
+    if (this.progress > 0) this.chart.showLoading(false);
+    this.chart.update([
+      {
+        id: 'SKIP',
+        name: `Test Désactivé (${this.apiTraceGroup.nbTestSkip}/${this.apiTraceGroup.nbTest})`,
+        y: (this.apiTraceGroup.nbTestSkip / this.apiTraceGroup.nbTest) * 100,
+        color: this.status['SKIP']['color']
+      }, {
+        id: 'OK',
+        name: `Test Passant (${this.apiTraceGroup.nbTestOk}/${this.apiTraceGroup.nbTest})`,
+        y: (this.apiTraceGroup.nbTestOk / this.apiTraceGroup.nbTest) * 100,
+        color: this.status['OK']['color']
+      }, {
+        id: 'KO',
+        name: `Test Non Passant (${this.apiTraceGroup.nbTestKo}/${this.apiTraceGroup.nbTest})`,
+        y: (this.apiTraceGroup.nbTestKo / this.apiTraceGroup.nbTest) * 100,
+        color: this.status['KO']['color']
+      }]);
+  }
 }
 
 export class ResultGroup {
   name: string;
-  results: Array<ApiAssertionsResultServer>;
+  results: Array<AssertionResultServer>;
 
 
-  constructor(name: string, results: Array<ApiAssertionsResultServer>) {
+  constructor(name: string, results: Array<AssertionResultServer>) {
     this.name = name;
     this.results = results;
   }

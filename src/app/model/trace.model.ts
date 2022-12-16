@@ -1,29 +1,29 @@
 import { ApiServerConfig } from "./environment.model";
 import { ApiRequest } from "./request.model";
 
-export class ApiExecution {
+export class RequestExecution {
     host: string;
     start: number;
     end: number;
 }
 
-export class ApiAssertionsResult {
+export class AssertionResult {
     id: number;
-    expExecution: ApiExecution;
-    actExecution: ApiExecution;
+    expExecution: RequestExecution;
+    actExecution: RequestExecution;
     status: string;
     step: string;
 }
 
-export class ApiAssertionsResultServer {
-    result: ApiAssertionsResult;
+export class AssertionResultServer {
+    result: AssertionResult;
     request: ApiRequest;
 }
 
 export class AssertionContext {
     user: string;
-	os: string;
-	address: string;
+    os: string;
+    address: string;
 }
 
 export class ApiTraceGroup {
@@ -37,7 +37,8 @@ export class ApiTraceGroup {
     status: string;
     nbTest: number;
     nbTestOk: number;
-    nbTestDisable: number;
+    nbTestKo: number;
+    nbTestSkip: number;
 }
 
 export class ResponseComparator {
@@ -49,8 +50,8 @@ export class ResponseComparator {
 
 export class ApiResponseServer {
     statusCode: number;
-	contentType: string;
-	response: string;
+    contentType: string;
+    response: string;
 }
 
 export class ComparatorData {
@@ -59,6 +60,6 @@ export class ComparatorData {
 }
 
 export class Data {
-    tableElements: Array<ApiAssertionsResultServer>;
+    tableElements: Array<AssertionResultServer>;
     environments: Array<ApiServerConfig>;
 }

@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatExpansionPanelHeader } from '@angular/material/expansion';
 import { DiffEditorModel } from 'ngx-monaco-editor-v2';
 import { ApiRequest, ApiRequestServer } from 'src/app/model/request.model';
-import { ApiAssertionsResultServer, ApiExecution, ApiResponseServer, ComparatorData, ResponseComparator } from 'src/app/model/trace.model';
+import { AssertionResultServer, RequestExecution, ApiResponseServer, ComparatorData, ResponseComparator } from 'src/app/model/trace.model';
 
 @Component({
   selector: 'app-comparator',

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ViewEncapsulation, AfterViewInit } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -16,20 +16,26 @@ import { Router } from '@angular/router';
   templateUrl: './request.component.html',
   styleUrls: ['./request.component.scss']
 })
-export class RequestComponent implements OnInit {
+export class RequestComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   displayedColumns: string[] = ['name', 'app', 'envs', 'enable', 'action'];
-  dataSource: MatTableDataSource<ApiRequestServer>;
+  dataSource: MatTableDataSource<ApiRequestServer> = new MatTableDataSource([]);
 
   environments: Array<ApiServerConfig>;
 
   constructor(public dialog: MatDialog, private router: Router, private _requestService: RequestService, private _environmentService: EnvironmentService) {
-    _environmentService.environments.subscribe({
+    
+  }
+
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    this._environmentService.environments.subscribe({
       next: res => this.environments = res
     });
-    _requestService.requests.subscribe({
+    this._requestService.requests.subscribe({
       next: res => {
         this.dataSource = new MatTableDataSource(res);
         this.dataSource.filterPredicate = (data: ApiRequestServer, filter) => {
@@ -44,8 +50,6 @@ export class RequestComponent implements OnInit {
       }
     });
   }
-
-  ngOnInit(): void {}
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
