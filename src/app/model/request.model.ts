@@ -19,7 +19,6 @@ export class ApiRequest {
     method: string;
     headers: { [key: string]: string };
     body: string;
-    charset: string;
     name: string;
     description: string;
     configuration: AssertionConfig;

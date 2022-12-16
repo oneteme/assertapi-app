@@ -1,5 +1,5 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -14,16 +14,24 @@ import { RemoveDialogComponent } from './remove-dialog/remove-dialog.component';
   templateUrl: './environment.component.html',
   styleUrls: ['./environment.component.scss']
 })
-export class EnvironmentComponent implements OnInit {
+export class EnvironmentComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   displayedColumns: string[] = ['host', 'port', 'authMethod', 'env', 'app', 'action'];
-  dataSource: MatTableDataSource<ApiServerConfig>;
+  dataSource: MatTableDataSource<ApiServerConfig> = new MatTableDataSource([]);
 
   constructor(public dialog: MatDialog, private _environmentService: EnvironmentService) {
-    _environmentService.environments.subscribe({
+    
+  }
+
+  ngOnInit(): void {
+
+  }
+
+  ngAfterViewInit(): void {
+    this._environmentService.environments.subscribe({
       next: res => {
         this.dataSource = new MatTableDataSource(res);
         this.dataSource.filterPredicate = (data: ApiServerConfig, filter) => {
@@ -41,8 +49,6 @@ export class EnvironmentComponent implements OnInit {
       }
     });
   }
-
-  ngOnInit(): void {}
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

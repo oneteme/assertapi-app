@@ -6,7 +6,7 @@
             </div>
             <div class="label">
                 <div class="title">Resultat du lancement</div>
-                <div class="sub-title" *ngIf="ctx">{{ctx.user}} le {{idGroup | date: 'dd/MM/yyyy à hh:ss:mm'}}</div>
+                <div class="sub-title" *ngIf="apiTraceGroup">{{apiTraceGroup.user}} le {{idGroup | date: 'dd/MM/yyyy à hh:ss:mm'}}</div>
             </div>
         </div>
     </div>

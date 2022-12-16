@@ -29,7 +29,7 @@ export class AssertapiClientService {
       .put(url, body, { params: filterArgs(args) });
   }
 
-  post(url: string, body?: any, headers?: { [param: string]: string | string[]} , args?: { [param: string]: string | string[] }): Observable<any> {
+  post(url: string, body?: any, headers?: { [param: string]: string | string[]} , args?: { [param: string]: any | any[] }): Observable<any> {
     return this.http
       .post(url, body, { headers: filterArgs(headers), params: filterArgs(args) });
   }

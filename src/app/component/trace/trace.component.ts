@@ -14,7 +14,7 @@ const STATUS: { [key: string]: Object } = {
     icon: 'done'
   },
   KO: {
-    color: 'red',
+    color: 'gold',
     icon: 'report'
   },
   SKIP: {

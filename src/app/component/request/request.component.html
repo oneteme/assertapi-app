@@ -1,5 +1,5 @@
 <div class="action-right">
-    <button mat-mini-fab color="primary" *ngIf="dataSource?.data.length" (click)="launchAll()" matTooltip="Lancer les tests par environnement" matTooltipPosition="left" style="margin-bottom: 0.5em;">
+    <button mat-mini-fab color="primary" (click)="launchAll()" matTooltip="Lancer les tests par environnement" matTooltipPosition="left" style="margin-bottom: 0.5em;">
         <mat-icon>replay</mat-icon>
     </button>
     <button matTooltip="Ajouter un nouveau test" matTooltipPosition="left" mat-mini-fab color="primary" (click)="add()">
@@ -11,7 +11,7 @@
     <div class="header-page">
         <div class="title">
             <div class="icon">
-                <mat-icon class="material-icons-outlined">desktop_windows</mat-icon>
+                <mat-icon class="material-icons-outlined">checklist_rtl</mat-icon>
             </div>
             <div class="label">
                 <div class="title">Supervision des tests</div>
