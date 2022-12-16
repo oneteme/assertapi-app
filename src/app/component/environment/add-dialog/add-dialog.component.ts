@@ -50,17 +50,12 @@ export class AddDialogComponent implements OnInit {
         apiServerConfig.id = this.data.id;
         this._service.updateEnvironment(apiServerConfig)
           .subscribe({
-            next: () => {
-              this.dialogRef.close(apiServerConfig)
-            }
+            next: () => this.dialogRef.close()
           });
       } else {
         this._service.putEnvironment(apiServerConfig)
           .subscribe({
-            next: res => {
-              apiServerConfig.id = res;
-              this.dialogRef.close(apiServerConfig);
-            }
+            next: () => this.dialogRef.close()
           });
       }
     } else {
@@ -84,8 +79,8 @@ export class AddDialogComponent implements OnInit {
   modelToForm(data: ApiServerConfig) {
     this.host.setValue(data.serverConfig.host);
     this.port.setValue(data.serverConfig.port);
-    this.methodAuth.setValue(data.serverConfig.auth.type);
-    this.hostAuth.setValue(data.serverConfig.auth['access-token-url']);
+    this.methodAuth.setValue(data.serverConfig.auth?.type);
+    this.hostAuth?.setValue(data.serverConfig.auth?.['access-token-url']);
     this.env.setValue(data.env);
     this.app.setValue(data.app);
   }

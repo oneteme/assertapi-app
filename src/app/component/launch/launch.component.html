@@ -1,0 +1,167 @@
+<div class="action-right">
+    <button (click)="launch()" matTooltip="Lancer les tests" matTooltipPosition="left" mat-mini-fab color="primary">
+        <mat-icon>play_arrow</mat-icon>
+    </button>
+</div>
+
+<div class="header-page">
+    <div class="title">
+        <div class="icon">
+            <mat-icon class="material-icons-outlined">launch</mat-icon>
+        </div>
+        <div class="label">
+            <div class="title">Lancement des tests</div>
+        </div>
+    </div>
+</div>
+
+<mat-accordion class="example-headers-align">
+    <mat-expansion-panel #launchPanel expanded style="margin-bottom: 1em;">
+        <mat-expansion-panel-header #launchPanelHeader>
+            <mat-panel-title>
+                Lancement
+            </mat-panel-title>
+            <mat-panel-description>
+                Choisissez vos environnements
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div style="display: flex; align-content: space-around;">
+            <div style="display: flex; flex-direction: column; flex-grow: 1;" [formGroup]="actualForm">
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="width: 50%;" appearance="fill">
+                        <mat-label>Application actuelle</mat-label>
+                        <mat-select formControlName="app">
+                            <mat-option *ngFor="let app of actualApps" [value]="app.value">{{app.name}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="actualApp.hasError('required')">L'application est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="width: 50%;" appearance="fill">
+                        <mat-label>Environnement actuel</mat-label>
+                        <mat-select formControlName="env">
+                            <mat-option *ngFor="let env of actualEnvs" [value]="env.value">{{env.name}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="actualEnv.hasError('required')">L'environnement est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div style="display: flex; flex-direction: column;" [formGroup]="actualLogin">
+                    <div style="display: flex;">
+                        <mat-form-field style="width: 50%;" appearance="fill">
+                            <mat-label>Nom d'utilisateur</mat-label>
+                            <input matInput formControlName="username">
+                            <mat-error *ngIf="actualLoginUsername.hasError('required')">Le nom d'utilisateur est
+                                obligatoire</mat-error>
+                        </mat-form-field>
+                        <mat-form-field style="width: 50%;" appearance="fill">
+                            <mat-label>Mot de passe</mat-label>
+                            <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
+                            <button mat-icon-button matSuffix (click)="hide = !hide">
+                                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                            <mat-error *ngIf="actualLoginpassword.hasError('required')">Le mot de passe est
+                                obligatoire</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <mat-divider [vertical]="true"></mat-divider>
+            <div style="display: flex; flex-direction: column; flex-grow: 1;" [formGroup]="expectedForm">
+                <div style="margin-bottom: 1em; display: flex;">
+                    <mat-form-field style="width: 50%;" appearance="fill">
+                        <mat-label>Application attendue</mat-label>
+                        <mat-select formControlName="app">
+                            <mat-option *ngFor="let app of expectedApps" [value]="app.value">{{app.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="expectedApp.hasError('required')">L'environnement est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="width: 50%;" appearance="fill">
+                        <mat-label>Environnement attendu</mat-label>
+                        <mat-select formControlName="env">
+                            <mat-option *ngFor="let env of expectedEnvs" [value]="env.value">{{env.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="expectedEnv.hasError('required')">L'environnement est obligatoire
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div style="display: flex; flex-direction: column;" [formGroup]="expectedLogin">
+                    <div style="display: flex;">
+                        <mat-form-field style="width: 50%;" appearance="fill">
+                            <mat-label>Nom d'utilisateur</mat-label>
+                            <input matInput formControlName="username">
+                            <mat-error *ngIf="expectedLoginUsername.hasError('required')">Le nom d'utilisateur est
+                                obligatoire</mat-error>
+                        </mat-form-field>
+                        <mat-form-field style="width: 50%;" appearance="fill">
+                            <mat-label>Mot de passe</mat-label>
+                            <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
+                            <button mat-icon-button matSuffix (click)="hide = !hide">
+                                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                            <mat-error *ngIf="expectedLoginpassword.hasError('required')">Le mot de passe est
+                                obligatoire</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <mat-action-row>
+            <button mat-button color="primary" (click)="choose()">
+                <icon-label icon="filter_alt" label="Liste des tests"></icon-label>
+            </button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>
+<mat-accordion class="example-headers-align">
+    <mat-expansion-panel #choosePanel style="margin-bottom: 1em;" [disabled]="!chooseDataSource.data.length">
+        <mat-expansion-panel-header #choosePanelHeader>
+            <mat-panel-title>
+                Requêtes
+            </mat-panel-title>
+            <mat-panel-description>
+                Choisissez vos tests à désactiver
+                <mat-icon>checklist_rtl</mat-icon>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <mat-form-field style="width: 100%;">
+            <input matInput (keyup)="applyFilter($event)" placeholder="Filtrer..." #input>
+        </mat-form-field>
+        <mat-paginator #choosePaginator [pageSizeOptions]="[10, 20, 50]"></mat-paginator>
+
+        <table mat-table [dataSource]="chooseDataSource" #chooseSort="matSort" matSort>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nom de l'Api </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.request.name}}
+                    <icon-label icon="description" [label]="element.request.description" [size]="18"></icon-label>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox style="margin-bottom: 0.5em;" (change)="$event ? toggleChooseAllRows() : null"
+                        [checked]="chooseSelection.hasValue() && isChooseAllSelected()"
+                        [indeterminate]="chooseSelection.hasValue() && !isChooseAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? chooseSelection.toggle(row) : null"
+                        [checked]="chooseSelection.isSelected(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="chooseDisplayedColumns;  sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: chooseDisplayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="4">Aucune donnée correspondant au filtre</td>
+            </tr>
+        </table>
+    </mat-expansion-panel>
+</mat-accordion>
+
